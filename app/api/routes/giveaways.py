@@ -64,6 +64,40 @@ async def list_giveaways(
     return items
 
 
+@router.get('/search/{term}', response_model=list[Giveaway])
+async def search_giveaways(
+    term: str,
+    platform: Optional[str] = Query(default=None, description="ex: steam, pc, epic-games-store"),
+    only_active: bool = Query(default=False, description="Visa bara aktiva giveaways"),
+    limit: Optional[int] = Query(default=None, ge=1, le=100),
+    gp: GamerPowerClient = Depends(get_gamerpower_client),
+):
+    try:
+        raw = await gp.get_giveaways(platform=platform)
+    except Exception as e:
+        logger.exception('Failed to fetch giveaways for search')
+        raise HTTPException(status_code=502, detail=str(e))
+
+    items = [Giveaway(**g) for g in raw]
+    needle = term.lower()
+
+    items = [
+        g for g in items
+        if needle in (g.title or '').lower()
+        or needle in (g.description or '').lower()
+    ]
+
+    if only_active:
+        items = [g for g in items if g.status == 'Active']
+
+    logger.info('Search "%s" → %d matches', term, len(items))
+
+    if limit:
+        items = items[:limit]
+
+    return items
+
+
 @router.get('/{giveaway_id}', response_model=Giveaway)
 async def giveaway_details(
     giveaway_id: int,
