@@ -23,3 +23,12 @@ class Giveaway(BaseModel):
     status: Optional[str] = None
     gamerpower_url: Optional[str] = None
     
+    def worth_as_float(self) -> Optional[Field]:
+        """Parses the 'worth' string to float. Ex: '$9.99' → 9.99."""
+        if not self.worth:
+            return None
+        cleaned = self.worth.replace('$', '').replace(',', '.').strip()
+        try:
+            return float(cleaned)
+        except ValueError:
+            return None
