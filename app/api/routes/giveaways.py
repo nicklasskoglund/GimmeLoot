@@ -13,8 +13,10 @@ logger = logging.getLogger('api.giveaways')
 
 router = APIRouter(prefix='/giveaways', tags=['giveaways'])
 
+
 def get_http(request: Request) -> httpx.AsyncClient:
     return request.app.state.http
+
 
 def get_gamerpower_client(http: httpx.AsyncClient = Depends(get_http)) -> GamerPowerClient:
     return GamerPowerClient(http)
@@ -26,6 +28,9 @@ async def list_giveaways(
     giveaway_type: Optional[str] = Query(default=None, alias="type", description="ex: game, loot, beta"),
     sort_by: Optional[str] = Query(default=None, description="ex: date, value, popularity"),
     limit: Optional[int] = Query(default=None, ge=1, le=100),
+    contains: Optional[str] = Query(default=None, description="Free text search in title/description"),
+    only_active: bool = Query(default=False, description="Show only active giveaways"),
+    min_worth: Optional[float] = Query(default=None, description="Minimum value in dollars, ex: 9.99"),
     gp: GamerPowerClient = Depends(get_gamerpower_client),
 ):
     try:
@@ -33,13 +38,31 @@ async def list_giveaways(
     except Exception as e:
         logger.exception('Failed to fetch giveaways')
         raise HTTPException(status_code=502, detail=str(e))
-    
+
+    items = [Giveaway(**g) for g in raw]
+    logger.info('Upstream returned %d items', len(items))
+
+    if contains:
+        term = contains.lower()
+        items = [g for g in items if term in (g.title or '').lower()
+                 or term in (g.description or '').lower()]
+
+    if only_active:
+        items = [g for g in items if g.status == 'Active']
+
+    if min_worth is not None:
+        items = [g for g in items if (g.worth_as_float() or 0) >= min_worth]
+
+    logger.info(
+        'After local filtering: %d items (contains=%s, only_active=%s, min_worth=%s)',
+        len(items), contains, only_active, min_worth,
+    )
+
     if limit:
-        raw = raw[:limit]
-        
-    # “print to CLI” → this is visible in the server log
-    logger.info('Returning %d giveaways', len(raw))
-    return raw
+        items = items[:limit]
+
+    return items
+
 
 @router.get('/{giveaway_id}', response_model=Giveaway)
 async def giveaway_details(
@@ -53,4 +76,3 @@ async def giveaway_details(
         raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
     except Exception as e:
         raise HTTPException(status_code=502, detail=str(e))
-    
