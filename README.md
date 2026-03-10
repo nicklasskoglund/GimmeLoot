@@ -79,6 +79,7 @@ GET /api/v1/giveaways?min_worth=15&only_active=true
 GET /api/v1/giveaways/525
 GET /api/v1/giveaways/search/steam?only_active=true&limit=3
 POST /api/v1/giveaways/query
+{"platform": "steam", "only_active": true, "min_worth": 10, "limit": 5}
 ```
 
 ## Project structure
