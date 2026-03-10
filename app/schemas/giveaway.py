@@ -32,3 +32,14 @@ class Giveaway(BaseModel):
             return float(cleaned)
         except ValueError:
             return None
+        
+        
+class QueryRequest(BaseModel):
+    platform: Optional[str] = None
+    type: Optional[str] = None
+    sort_by: Optional[str] = None
+    contains: Optional[str] = None
+    only_active: bool = False
+    min_worth: Optional[float] = None
+    search: Optional[str] = None
+    limit: Optional[int] = Field(default=None, ge=1, le=100)
