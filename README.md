@@ -34,6 +34,7 @@ http://127.0.0.1:8000/api/v1
 | `GET` | `/giveaways` | List giveaways with optional filtering |
 | `GET` | `/giveaways/{id}` | Get a single giveaway by ID |
 | `GET` | `/giveaways/search/{term}` | Search giveaways by keyword |
+| `POST` | `/giveaways/query` | Filter giveaways via JSON body |
 
 ### Query params – `GET /giveaways`
 
@@ -55,6 +56,19 @@ http://127.0.0.1:8000/api/v1
 | `only_active` | bool | If `true`, returns only active giveaways |
 | `limit` | int | Max number of results (1–100) |
 
+### Request body – `POST /giveaways/query`
+
+| Field | Type | Description |
+|---|---|---|
+| `platform` | string | Filter by platform, ex: `steam`, `pc` |
+| `type` | string | Filter by type, ex: `game`, `loot` |
+| `sort_by` | string | Sort results, ex: `date`, `value`, `popularity` |
+| `contains` | string | Case-insensitive match in title/description |
+| `only_active` | bool | If `true`, returns only active giveaways |
+| `min_worth` | float | Minimum worth in USD |
+| `search` | string | Broader keyword search in title/description |
+| `limit` | int | Max number of results (1–100) |
+
 ## Example requests
 ```
 GET /api/v1/health
@@ -64,6 +78,8 @@ GET /api/v1/giveaways?contains=fortnite&only_active=true
 GET /api/v1/giveaways?min_worth=15&only_active=true
 GET /api/v1/giveaways/525
 GET /api/v1/giveaways/search/steam?only_active=true&limit=3
+POST /api/v1/giveaways/query
+{"platform": "steam", "only_active": true, "min_worth": 10, "limit": 5}
 ```
 
 ## Project structure

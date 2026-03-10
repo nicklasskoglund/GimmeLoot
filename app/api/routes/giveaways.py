@@ -6,7 +6,7 @@ from typing import Optional
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
-from app.schemas.giveaway import Giveaway
+from app.schemas.giveaway import Giveaway, QueryRequest
 from app.services.gamerpower_client import GamerPowerClient
 
 logger = logging.getLogger('api.giveaways')
@@ -110,3 +110,51 @@ async def giveaway_details(
         raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
     except Exception as e:
         raise HTTPException(status_code=502, detail=str(e))
+
+
+@router.post('/query', response_model=list[Giveaway])
+async def query_giveaways(
+    body: QueryRequest,
+    gp: GamerPowerClient = Depends(get_gamerpower_client),
+):
+    try:
+        raw = await gp.get_giveaways(
+            platform=body.platform,
+            giveaway_type=body.type,
+            sort_by=body.sort_by,
+        )
+    except Exception as e:
+        logger.exception('Failed to fetch giveaways for query')
+        raise HTTPException(status_code=502, detail=str(e))
+
+    items = [Giveaway(**g) for g in raw]
+    logger.info('Upstream returned %d items', len(items))
+
+    if body.search:
+        needle = body.search.lower()
+        items = [
+            g for g in items
+            if needle in (g.title or '').lower()
+            or needle in (g.description or '').lower()
+        ]
+
+    if body.contains:
+        term = body.contains.lower()
+        items = [
+            g for g in items
+            if term in (g.title or '').lower()
+            or term in (g.description or '').lower()
+        ]
+
+    if body.only_active:
+        items = [g for g in items if g.status == 'Active']
+
+    if body.min_worth is not None:
+        items = [g for g in items if (g.worth_as_float() or 0) >= body.min_worth]
+
+    logger.info('Query result: %d items', len(items))
+
+    if body.limit:
+        items = items[:body.limit]
+
+    return items
