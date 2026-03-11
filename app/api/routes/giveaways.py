@@ -18,8 +18,11 @@ def get_http(request: Request) -> httpx.AsyncClient:
     return request.app.state.http
 
 
-def get_gamerpower_client(http: httpx.AsyncClient = Depends(get_http)) -> GamerPowerClient:
-    return GamerPowerClient(http)
+def get_gamerpower_client(
+    http: httpx.AsyncClient = Depends(get_http),
+    request: Request = None,
+) -> GamerPowerClient:
+    return GamerPowerClient(http, request.app.state.cache)
 
 
 @router.get("", response_model=list[Giveaway])

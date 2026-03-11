@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from app.api.router import api_router
 from app.middlewares.request_id import RequestIdMiddleware
 from app.utils.logging import setup_logging
+from app.services.cache import TTLCache
 
 GAMERPOWER_BASE_URL = 'https://gamerpower.com/api'
 
@@ -23,6 +24,7 @@ async def lifespan(app: FastAPI):
         timeout=httpx.Timeout(10.0),
         headers={'User-Agent': 'Nicklas-FastAPI-Proxy/1.0'},
     )
+    app.state.cache = TTLCache(ttl=60)
     yield
     await app.state.http.aclose()
     
