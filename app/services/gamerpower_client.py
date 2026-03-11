@@ -4,14 +4,16 @@ import logging
 from typing import Any, Optional
 
 import httpx
+from app.services.cache import TTLCache
 
 
 logger = logging.getLogger('gamerpower.client')
 
 
 class GamerPowerClient:
-    def __init__(self, http: httpx.AsyncClient):
+    def __init__(self, http: httpx.AsyncClient, cache: TTLCache):
         self.http = http
+        self.cache = cache
         
     async def get_giveaways(
         self,
@@ -26,7 +28,12 @@ class GamerPowerClient:
             params['type'] = giveaway_type
         if sort_by:
             params['sort-by'] = sort_by     # GamerPower uses 'sort-by'
-            
+                
+        cached = self.cache.get(platform=platform, giveaway_type=giveaway_type, sort_by=sort_by)
+        if cached is not None:
+            logger.info('Cache HIT – returning %d cached giveaways', len(cached))
+            return cached
+        
         logger.info('GET /giveaways params=%s', params)
         
         try:
@@ -43,6 +50,7 @@ class GamerPowerClient:
         data = r.json()
         if isinstance(data, list):
             logger.info('Upstream returned %d giveaways', len(data))
+            self.cache.set(data, platform=platform, giveaway_type=giveaway_type, sort_by=sort_by)
             return data
         
         # fallback (if the API were to change format)
