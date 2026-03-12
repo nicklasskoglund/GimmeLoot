@@ -22,7 +22,7 @@ def get_gamerpower_client(
     http: httpx.AsyncClient = Depends(get_http),
     request: Request = None,
 ) -> GamerPowerClient:
-    return GamerPowerClient(http, request.app.state.cache)
+    return GamerPowerClient(http, request.app.state.cache, request.app.state.rate_limiter)
 
 
 @router.get("", response_model=list[Giveaway])
@@ -39,6 +39,10 @@ async def list_giveaways(
 ):
     try:
         raw = await gp.get_giveaways(platform=platform, giveaway_type=giveaway_type, sort_by=sort_by)
+    except RuntimeError as e:
+        if 'Rate limit' in str(e):
+            return error_response(429, "rate_limit_exceeded", str(e), request)
+        return error_response(502, "upstream_error", str(e), request)
     except Exception as e:
         logger.exception('Failed to fetch giveaways')
         return error_response(502, "upstream_error", str(e), request)
@@ -79,6 +83,10 @@ async def search_giveaways(
 ):
     try:
         raw = await gp.get_giveaways(platform=platform)
+    except RuntimeError as e:
+        if 'Rate limit' in str(e):
+            return error_response(429, "rate_limit_exceeded", str(e), request)
+        return error_response(502, "upstream_error", str(e), request)
     except Exception as e:
         logger.exception('Failed to fetch giveaways for search')
         return error_response(502, "upstream_search_error", str(e), request)
@@ -114,6 +122,10 @@ async def giveaway_details(
         return raw
     except httpx.HTTPStatusError as e:
         return error_response(e.response.status_code, "upstream_http_error", f"Upstream returned {e.response.status_code} for giveaway {giveaway_id}", request)
+    except RuntimeError as e:
+        if 'Rate limit' in str(e):
+            return error_response(429, "rate_limit_exceeded", str(e), request)
+        return error_response(502, "upstream_error", str(e), request)
     except Exception as e:
         return error_response(502, "upstream_giveaway_error", str(e), request)
 
@@ -130,6 +142,10 @@ async def query_giveaways(
             giveaway_type=body.type,
             sort_by=body.sort_by,
         )
+    except RuntimeError as e:
+        if 'Rate limit' in str(e):
+            return error_response(429, "rate_limit_exceeded", str(e), request)
+        return error_response(502, "upstream_error", str(e), request)
     except Exception as e:
         logger.exception('Failed to fetch giveaways for query')
         return error_response(502, "upstream_query_error", str(e), request)

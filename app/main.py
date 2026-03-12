@@ -9,6 +9,7 @@ from app.api.router import api_router
 from app.middlewares.request_id import RequestIdMiddleware
 from app.utils.logging import setup_logging
 from app.services.cache import TTLCache
+from app.services.rate_limiter import RateLimiter
 
 GAMERPOWER_BASE_URL = 'https://gamerpower.com/api'
 
@@ -25,10 +26,11 @@ async def lifespan(app: FastAPI):
         headers={'User-Agent': 'Nicklas-FastAPI-Proxy/1.0'},
     )
     app.state.cache = TTLCache(ttl=60)
+    app.state.rate_limiter = RateLimiter(max_calls=5, period=1.0)
     yield
     await app.state.http.aclose()
     
-app = FastAPI(title='GamerPower Proxy API', version='0.3.0', lifespan=lifespan)
+app = FastAPI(title='GamerPower Proxy API', version='0.5.0', lifespan=lifespan)
 app.add_middleware(RequestIdMiddleware)
 
 app.include_router(api_router)

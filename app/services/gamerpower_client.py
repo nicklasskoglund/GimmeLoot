@@ -5,15 +5,17 @@ from typing import Any, Optional
 
 import httpx
 from app.services.cache import TTLCache
+from app.services.rate_limiter import RateLimiter
 
 
 logger = logging.getLogger('gamerpower.client')
 
 
 class GamerPowerClient:
-    def __init__(self, http: httpx.AsyncClient, cache: TTLCache):
+    def __init__(self, http: httpx.AsyncClient, cache: TTLCache, rate_limiter: RateLimiter):
         self.http = http
         self.cache = cache
+        self.rate_limiter = rate_limiter
         
     async def get_giveaways(
         self,
@@ -28,6 +30,9 @@ class GamerPowerClient:
             params['type'] = giveaway_type
         if sort_by:
             params['sort-by'] = sort_by     # GamerPower uses 'sort-by'
+                
+        if not self.rate_limiter.is_allowed():
+            raise RuntimeError('Rate limit exceeded – too many upstream requests')
                 
         cached = self.cache.get(platform=platform, giveaway_type=giveaway_type, sort_by=sort_by)
         if cached is not None:
