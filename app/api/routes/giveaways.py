@@ -4,13 +4,13 @@ import logging
 from typing import Optional
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Query, Request
 
 from app.schemas.giveaway import Giveaway, QueryRequest
 from app.services.gamerpower_client import GamerPowerClient
+from app.utils.errors import error_response
 
 logger = logging.getLogger('api.giveaways')
-
 router = APIRouter(prefix='/giveaways', tags=['giveaways'])
 
 
@@ -22,11 +22,12 @@ def get_gamerpower_client(
     http: httpx.AsyncClient = Depends(get_http),
     request: Request = None,
 ) -> GamerPowerClient:
-    return GamerPowerClient(http, request.app.state.cache)
+    return GamerPowerClient(http, request.app.state.cache, request.app.state.rate_limiter)
 
 
 @router.get("", response_model=list[Giveaway])
 async def list_giveaways(
+    request: Request,
     platform: Optional[str] = Query(default=None, description="ex: steam, pc, epic-games-store"),
     giveaway_type: Optional[str] = Query(default=None, alias="type", description="ex: game, loot, beta"),
     sort_by: Optional[str] = Query(default=None, description="ex: date, value, popularity"),
@@ -38,9 +39,13 @@ async def list_giveaways(
 ):
     try:
         raw = await gp.get_giveaways(platform=platform, giveaway_type=giveaway_type, sort_by=sort_by)
+    except RuntimeError as e:
+        if 'Rate limit' in str(e):
+            return error_response(429, "rate_limit_exceeded", str(e), request)
+        return error_response(502, "upstream_error", str(e), request)
     except Exception as e:
         logger.exception('Failed to fetch giveaways')
-        raise HTTPException(status_code=502, detail=str(e))
+        return error_response(502, "upstream_error", str(e), request)
 
     items = [Giveaway(**g) for g in raw]
     logger.info('Upstream returned %d items', len(items))
@@ -69,6 +74,7 @@ async def list_giveaways(
 
 @router.get('/search/{term}', response_model=list[Giveaway])
 async def search_giveaways(
+    request: Request,
     term: str,
     platform: Optional[str] = Query(default=None, description="ex: steam, pc, epic-games-store"),
     only_active: bool = Query(default=False, description="Visa bara aktiva giveaways"),
@@ -77,9 +83,13 @@ async def search_giveaways(
 ):
     try:
         raw = await gp.get_giveaways(platform=platform)
+    except RuntimeError as e:
+        if 'Rate limit' in str(e):
+            return error_response(429, "rate_limit_exceeded", str(e), request)
+        return error_response(502, "upstream_error", str(e), request)
     except Exception as e:
         logger.exception('Failed to fetch giveaways for search')
-        raise HTTPException(status_code=502, detail=str(e))
+        return error_response(502, "upstream_search_error", str(e), request)
 
     items = [Giveaway(**g) for g in raw]
     needle = term.lower()
@@ -103,6 +113,7 @@ async def search_giveaways(
 
 @router.get('/{giveaway_id}', response_model=Giveaway)
 async def giveaway_details(
+    request: Request,
     giveaway_id: int,
     gp: GamerPowerClient = Depends(get_gamerpower_client),
 ):
@@ -110,13 +121,18 @@ async def giveaway_details(
         raw = await gp.get_giveaway_by_id(giveaway_id)
         return raw
     except httpx.HTTPStatusError as e:
-        raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
+        return error_response(e.response.status_code, "upstream_http_error", f"Upstream returned {e.response.status_code} for giveaway {giveaway_id}", request)
+    except RuntimeError as e:
+        if 'Rate limit' in str(e):
+            return error_response(429, "rate_limit_exceeded", str(e), request)
+        return error_response(502, "upstream_error", str(e), request)
     except Exception as e:
-        raise HTTPException(status_code=502, detail=str(e))
+        return error_response(502, "upstream_giveaway_error", str(e), request)
 
 
 @router.post('/query', response_model=list[Giveaway])
 async def query_giveaways(
+    request: Request,
     body: QueryRequest,
     gp: GamerPowerClient = Depends(get_gamerpower_client),
 ):
@@ -126,9 +142,13 @@ async def query_giveaways(
             giveaway_type=body.type,
             sort_by=body.sort_by,
         )
+    except RuntimeError as e:
+        if 'Rate limit' in str(e):
+            return error_response(429, "rate_limit_exceeded", str(e), request)
+        return error_response(502, "upstream_error", str(e), request)
     except Exception as e:
         logger.exception('Failed to fetch giveaways for query')
-        raise HTTPException(status_code=502, detail=str(e))
+        return error_response(502, "upstream_query_error", str(e), request)
 
     items = [Giveaway(**g) for g in raw]
     logger.info('Upstream returned %d items', len(items))
