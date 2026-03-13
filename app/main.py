@@ -1,15 +1,24 @@
+# Standard library
 from __future__ import annotations
-
+import os
 from contextlib import asynccontextmanager
 
+# Third-party
+from dotenv import load_dotenv
 import httpx
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
+# Local
 from app.api.router import api_router
 from app.middlewares.request_id import RequestIdMiddleware
 from app.utils.logging import setup_logging
 from app.services.cache import TTLCache
 from app.services.rate_limiter import RateLimiter
+
+load_dotenv()
+
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
 
 GAMERPOWER_BASE_URL = 'https://gamerpower.com/api'
 
@@ -30,8 +39,15 @@ async def lifespan(app: FastAPI):
     yield
     await app.state.http.aclose()
     
-app = FastAPI(title='GamerPower Proxy API', version='0.5.0', lifespan=lifespan)
+app = FastAPI(title='GamerPower Proxy API', version='0.6.0', lifespan=lifespan)
 app.add_middleware(RequestIdMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(api_router)
 
