@@ -1,10 +1,8 @@
 # Standard library
 from __future__ import annotations
-import os
 from contextlib import asynccontextmanager
 
 # Third-party
-from dotenv import load_dotenv
 import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,21 +13,18 @@ from app.middlewares.request_id import RequestIdMiddleware
 from app.utils.logging import setup_logging
 from app.services.cache import TTLCache
 from app.services.rate_limiter import RateLimiter
-
-load_dotenv()
-
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
-
-GAMERPOWER_BASE_URL = 'https://gamerpower.com/api'
+from app.services.supabase_client import create_supabase_client
+from app.core.config import settings
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
+    app.state.supabase = create_supabase_client()
     
     # A shared AsyncClient (faster + cleaner than creating a new one per request)
     app.state.http = httpx.AsyncClient(
-        base_url=GAMERPOWER_BASE_URL,
+        base_url=settings.gamerpower_base_url,
         follow_redirects=True,
         timeout=httpx.Timeout(10.0),
         headers={'User-Agent': 'Nicklas-FastAPI-Proxy/1.0'},
@@ -43,7 +38,7 @@ app = FastAPI(title='GamerPower Proxy API', version='0.6.0', lifespan=lifespan)
 app.add_middleware(RequestIdMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
