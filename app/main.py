@@ -13,12 +13,14 @@ from app.middlewares.request_id import RequestIdMiddleware
 from app.utils.logging import setup_logging
 from app.services.cache import TTLCache
 from app.services.rate_limiter import RateLimiter
+from app.services.supabase_client import create_supabase_client
 from app.core.config import settings
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
+    app.state.supabase = create_supabase_client()
     
     # A shared AsyncClient (faster + cleaner than creating a new one per request)
     app.state.http = httpx.AsyncClient(
