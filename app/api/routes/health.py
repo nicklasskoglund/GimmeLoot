@@ -6,6 +6,14 @@ router = APIRouter(tags=['health'])
 async def health(request: Request):
     cache = request.app.state.cache
     rl = request.app.state.rate_limiter
+    supabase = request.app.state.supabase
+
+    try:
+        supabase.rpc("ping").execute()
+        db_status = "ok"
+    except Exception as e:
+        db_status = f"error: {e}"
+
     return {
         'status': 'ok',
         'cache': {
@@ -16,5 +24,8 @@ async def health(request: Request):
             'max_calls': rl.max_calls,
             'period_seconds': rl.period,
             'calls_in_window': len(rl._calls),
+        },
+        'database': {
+            'status': db_status,
         },
     }
