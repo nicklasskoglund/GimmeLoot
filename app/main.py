@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):
     yield
     await app.state.http.aclose()
     
-app = FastAPI(title='GamerPower Proxy API', version='0.6.0', lifespan=lifespan)
+app = FastAPI(title='GamerPower Proxy API', version='0.9.0', lifespan=lifespan)
 app.add_middleware(RequestIdMiddleware)
 app.add_middleware(
     CORSMiddleware,
