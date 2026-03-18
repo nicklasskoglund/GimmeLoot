@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 # Third-party
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 # Local
@@ -15,6 +15,7 @@ from app.services.cache import TTLCache
 from app.services.rate_limiter import RateLimiter
 from app.services.supabase_client import create_supabase_client
 from app.core.config import settings
+from app.utils.errors import error_response, AppError
 
 
 @asynccontextmanager
@@ -34,7 +35,12 @@ async def lifespan(app: FastAPI):
     yield
     await app.state.http.aclose()
     
-app = FastAPI(title='GamerPower Proxy API', version='0.9.0', lifespan=lifespan)
+app = FastAPI(title='GamerPower Proxy API', version='0.10.0', lifespan=lifespan)
+
+@app.exception_handler(AppError)
+async def app_error_handler(request: Request, exc: AppError):
+    return error_response(exc.status_code, "error", exc.detail, request)
+
 app.add_middleware(RequestIdMiddleware)
 app.add_middleware(
     CORSMiddleware,

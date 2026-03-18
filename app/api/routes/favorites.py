@@ -1,0 +1,27 @@
+from __future__ import annotations
+
+from fastapi import APIRouter, Depends, Request, status
+
+from app.schemas.favorites import FavoriteResponse
+from app.services.favorites_service import add_favorite, remove_favorite, get_favorites
+from app.utils.auth import get_current_user
+
+router = APIRouter(
+    prefix='/favorites',
+    tags=['favorites']
+)
+
+
+@router.post('/{giveaway_id}', response_model=FavoriteResponse, status_code=status.HTTP_201_CREATED)
+async def create_favorite(giveaway_id: int, request: Request, current_user: dict = Depends(get_current_user)):
+    return add_favorite(current_user['user_id'], giveaway_id, request.app.state.supabase)
+
+
+@router.delete('/{giveaway_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_favorite(giveaway_id: int, request: Request, current_user: dict = Depends(get_current_user)):
+    remove_favorite(current_user['user_id'], giveaway_id, request.app.state.supabase)
+    
+    
+@router.get('', response_model=list[FavoriteResponse])
+async def list_favorites(request: Request, current_user: dict = Depends(get_current_user)):
+    return get_favorites(current_user['user_id'], request.app.state.supabase)
