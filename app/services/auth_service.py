@@ -21,7 +21,7 @@ async def register_user(email: str, password: str, supabase) -> TokenResponse:
     }).execute()
     
     user_id = result.data[0]["id"]
-    token = create_access_token({"sub": user_id})
+    token = create_access_token({"user_id": user_id})
     return TokenResponse(message="User registered successfully!", user_id=user_id, access_token=token)
 
 
@@ -41,5 +41,5 @@ async def login_user(email: str, password: str, supabase) -> TokenResponse:
             detail="Incorrect password"
         )
 
-    token = create_access_token({"sub": user["id"]})
+    token = create_access_token({"user_id": user["id"]})
     return TokenResponse(message="Login successful!", user_id=user["id"], access_token=token)
