@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request, status
 
-from app.schemas.favorites import FavoriteResponse
-from app.services.favorites_service import add_favorite, remove_favorite, get_favorites
-from app.utils.auth import get_current_user
+from backend.schemas.favorites import FavoriteResponse
+from backend.services.favorites_service import add_favorite, remove_favorite, get_favorites
+from backend.utils.auth import get_current_user
 
 router = APIRouter(
     prefix='/favorites',

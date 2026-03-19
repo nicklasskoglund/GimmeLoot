@@ -4,8 +4,8 @@ import logging
 from typing import Any, Optional
 
 import httpx
-from app.services.cache import TTLCache
-from app.services.rate_limiter import RateLimiter
+from backend.services.cache import TTLCache
+from backend.services.rate_limiter import RateLimiter
 
 
 logger = logging.getLogger('gamerpower.client')
