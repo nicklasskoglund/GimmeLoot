@@ -6,7 +6,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from app.core.config import settings
+from backend.core.config import settings
 
 security = HTTPBearer()
 

@@ -8,14 +8,14 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 # Local
-from app.api.router import api_router
-from app.middlewares.request_id import RequestIdMiddleware
-from app.utils.logging import setup_logging
-from app.services.cache import TTLCache
-from app.services.rate_limiter import RateLimiter
-from app.services.supabase_client import create_supabase_client
-from app.core.config import settings
-from app.utils.errors import error_response, AppError
+from backend.api.router import api_router
+from backend.middlewares.request_id import RequestIdMiddleware
+from backend.utils.logging import setup_logging
+from backend.services.cache import TTLCache
+from backend.services.rate_limiter import RateLimiter
+from backend.services.supabase_client import create_supabase_client
+from backend.core.config import settings
+from backend.utils.errors import error_response, AppError
 
 
 @asynccontextmanager
