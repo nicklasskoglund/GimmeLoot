@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from supabase import Client
-from app.utils.errors import AppError
+from backend.utils.errors import AppError
 
 logger = logging.getLogger('gamerpower.favorites')
 

@@ -6,9 +6,9 @@ from typing import Optional
 import httpx
 from fastapi import APIRouter, Depends, Query, Request
 
-from app.schemas.giveaway import Giveaway, QueryRequest
-from app.services.gamerpower_client import GamerPowerClient
-from app.utils.errors import error_response
+from backend.schemas.giveaway import Giveaway, QueryRequest
+from backend.services.gamerpower_client import GamerPowerClient
+from backend.utils.errors import error_response
 
 logger = logging.getLogger('api.giveaways')
 router = APIRouter(prefix='/giveaways', tags=['giveaways'])

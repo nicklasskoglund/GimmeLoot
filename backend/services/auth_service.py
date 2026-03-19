@@ -1,8 +1,8 @@
 from fastapi import HTTPException, status
 
-from app.utils.password import hash_password, verify_password
-from app.utils.auth import create_access_token
-from app.schemas.auth import TokenResponse
+from backend.utils.password import hash_password, verify_password
+from backend.utils.auth import create_access_token
+from backend.schemas.auth import TokenResponse
 
 
 async def register_user(email: str, password: str, supabase) -> TokenResponse:

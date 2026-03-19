@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from supabase import create_client, Client
-from app.core.config import settings
+from backend.core.config import settings
 
 logger = logging.getLogger('gamerpower.supabase')
 
