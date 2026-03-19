@@ -1,5 +1,5 @@
 import apiClient from './client'
-import { Giveaway } from '../types/giveaway'
+import type { Giveaway } from '../types/giveaway'
 
 
 export const getGiveaways = async (): Promise<Giveaway[]> => {
