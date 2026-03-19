@@ -1,8 +1,11 @@
+import { Routes, Route } from 'react-router-dom'
+import GiveawaysPage from './pages/GiveawaysPage'
+
 function App() {
   return (
-    <div>
-      <h1>GimmeLoot</h1>
-    </div>
+    <Routes>
+      <Route path="/" element={<GiveawaysPage />} />
+    </Routes>
   )
 }
 
