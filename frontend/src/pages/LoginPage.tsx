@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from "../context/AuthContext"
 import { loginUser } from "../api/auth"
 
@@ -8,12 +9,15 @@ export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState<string | null>(null)
+    const navigate = useNavigate()
 
     const handleSubmit = async (e: React.SyntheticEvent) => {
         e.preventDefault()
+        setError(null)
         try {
             const result = await loginUser({ email, password })
             login(result)
+            navigate('/')
         } catch {
             setError('Login failed')
         }
