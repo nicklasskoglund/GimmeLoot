@@ -27,4 +27,4 @@ async def delete_account(request: Request, current_user: dict = Depends(get_curr
     
 @router.put("/user")
 async def update_account(body: UserUpdateRequest, request: Request, current_user: dict = Depends(get_current_user)):
-    return await update_user(current_user["user_id"], body.email, body.password, request.app.state.supabase)
+    return await update_user(current_user["user_id"], body.current_password, body.email, body.password, request.app.state.supabase)
