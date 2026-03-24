@@ -17,7 +17,7 @@ export default function LoginPage() {
         try {
             const result = await loginUser({ email, password })
             login(result)
-            navigate('/')
+            navigate('/favorites')
         } catch {
             setError('Login failed')
         }

@@ -47,3 +47,16 @@ def get_favorites(user_id: str, supabase: Client) -> list[dict]:
         .execute()
     )
     return result.data
+
+
+def get_favorite(user_id: str, favorite_id: str, supabase: Client) -> dict:
+    result = (
+        supabase.table('favorites')
+        .select('*')
+        .eq('id', favorite_id)
+        .eq('user_id', user_id)
+        .execute()
+    )
+    if not result.data:
+        raise AppError(status_code=404, detail='Favorite not found')
+    return result.data[0]
