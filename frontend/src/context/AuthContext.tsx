@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
+import { setAuthToken } from '../api/client'
 
 
 interface AuthUser {
@@ -18,8 +19,15 @@ const AuthContext = createContext<AuthContextType | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null)
 
-    const login = (user: AuthUser) => setUser(user)
-    const logout = () => setUser(null)
+    const login = (user: AuthUser) => {
+        setAuthToken(user.access_token)
+        setUser(user)
+    }
+
+    const logout = () => {
+        setAuthToken(null)
+        setUser(null)
+    }
 
     return (
         <AuthContext.Provider value={{ user, login, logout }}>

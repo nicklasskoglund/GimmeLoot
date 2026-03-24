@@ -22,7 +22,13 @@ export async function loginUser(payload: LoginPayload) {
     return response.data
 }
 
+
 export async function registerUser(payload: RegisterPayload) {
     const response = await client.post<AuthResponse>('/auth/register', payload)
     return response.data
+}
+
+
+export async function deleteUser() {
+    await client.delete('/auth/user')
 }

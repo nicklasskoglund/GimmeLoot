@@ -43,3 +43,13 @@ async def login_user(email: str, password: str, supabase) -> TokenResponse:
 
     token = create_access_token({"user_id": user["id"]})
     return TokenResponse(message="Login successful!", user_id=user["id"], access_token=token)
+
+
+async def delete_user(user_id: str, supabase) -> None:
+    supabase.table('favorites').delete().eq('user_id', user_id).execute()
+    result = supabase.table('users').delete().eq('id', user_id).execute()
+    if not result.data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='User not found'
+        )
