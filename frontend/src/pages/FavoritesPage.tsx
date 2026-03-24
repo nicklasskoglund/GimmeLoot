@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { getFavorites, removeFavorite } from '../api/favorites'
 import type { Favorite } from '../api/favorites'
+import { getGiveaway } from '../api/giveaways'
+import type { Giveaway } from '../types/giveaway'
 import { deleteUser } from '../api/auth'
 import { useNavigate } from 'react-router-dom'
 
@@ -12,12 +14,19 @@ function FavoritesPage() {
     const [favorites, setFavorites] = useState<Favorite[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [giveaways, setGiveaways] = useState<Record<number, Giveaway>>({})
 
     useEffect(() => {
         const fetchFavorites = async () => {
             try {
                 const data = await getFavorites()
                 setFavorites(data)
+                const giveawayData = await Promise.all(
+                    data.map(f => getGiveaway(f.giveaway_id))
+                )
+                const giveawayMap: Record<number, Giveaway> = {}
+                giveawayData.forEach(g => { giveawayMap[g.id] = g })
+                setGiveaways(giveawayMap)
             } catch {
                 setError('Failed to load favorites.')
             } finally {
@@ -46,12 +55,16 @@ function FavoritesPage() {
             {error && <p>{error}</p>}
             {!loading && !error && (
                 <ul>
-                    {favorites.map(f => (
-                        <li key={f.id}>
-                            Giveaway #{f.giveaway_id}
-                            <button onClick={() => handleRemove(f.giveaway_id)}>Remove</button>
-                        </li>
-                    ))}
+                    {favorites.map(f => {
+                        const g = giveaways[f.giveaway_id]
+                        return (
+                            <li key={f.id}>
+                                {g && <img src={g.image} alt={g.title} width={100} />}
+                                <span>{g ? g.title : `Giveaway #${f.giveaway_id}`}</span>
+                                <button onClick={() => handleRemove(f.giveaway_id)}>Remove</button>
+                            </li>
+                        )
+                    })}
                 </ul>
             )}
             <button onClick={handleDeleteAccount}>Delete account</button>
