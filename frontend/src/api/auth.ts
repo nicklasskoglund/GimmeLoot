@@ -32,3 +32,8 @@ export async function registerUser(payload: RegisterPayload) {
 export async function deleteUser() {
     await client.delete('/auth/user')
 }
+
+
+export async function updateUser(data: { email?: string; password?: string }): Promise<void> {
+    await client.put("/auth/user", data);
+}
