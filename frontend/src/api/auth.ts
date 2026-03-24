@@ -34,6 +34,6 @@ export async function deleteUser() {
 }
 
 
-export async function updateUser(data: { email?: string; password?: string }): Promise<void> {
-    await client.put("/auth/user", data);
+export async function updateUser(data: { current_password: string; email?: string; password?: string }): Promise<void> {
+    await client.put("/auth/user", data)
 }
