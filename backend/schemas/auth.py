@@ -14,5 +14,6 @@ class TokenResponse(BaseModel):
 
 
 class UserUpdateRequest(BaseModel):
+    current_password: str
     email: Optional[str] = None
     password: Optional[str] = None
