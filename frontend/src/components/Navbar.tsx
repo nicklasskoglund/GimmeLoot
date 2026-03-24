@@ -17,6 +17,7 @@ function Navbar() {
             {user ? (
                 <>
                     <Link to='/favorites'>My Favorites</Link>
+                    <Link to='/account'>Account</Link>
                     <button onClick={handleLogout}>Logout</button>
                 </>
             ) : (

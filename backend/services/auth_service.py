@@ -1,4 +1,5 @@
 from fastapi import HTTPException, status
+from typing import Optional
 
 from backend.utils.password import hash_password, verify_password
 from backend.utils.auth import create_access_token
@@ -53,3 +54,35 @@ async def delete_user(user_id: str, supabase) -> None:
             status_code=status.HTTP_404_NOT_FOUND,
             detail='User not found'
         )
+        
+        
+async def update_user(user_id: str, current_password: str, email: Optional[str], password: Optional[str], supabase) -> dict:
+    result = supabase.table("users").select("*").eq("id", user_id).execute()
+    user = result.data[0] if result.data else None
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    if not verify_password(current_password, user["hashed_password"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password"
+        )
+
+    data = {}
+    if email is not None:
+        data["email"] = email
+    if password is not None:
+        data["hashed_password"] = hash_password(password)
+
+    if not data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No fields to update"
+        )
+
+    supabase.table("users").update(data).eq("id", user_id).execute()
+    return {"message": "User updated successfully"}
