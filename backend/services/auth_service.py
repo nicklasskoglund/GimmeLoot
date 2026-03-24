@@ -56,7 +56,22 @@ async def delete_user(user_id: str, supabase) -> None:
         )
         
         
-async def update_user(user_id: str, email: Optional[str], password: Optional[str], supabase) -> dict:
+async def update_user(user_id: str, current_password: str, email: Optional[str], password: Optional[str], supabase) -> dict:
+    result = supabase.table("users").select("*").eq("id", user_id).execute()
+    user = result.data[0] if result.data else None
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    if not verify_password(current_password, user["hashed_password"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password"
+        )
+
     data = {}
     if email is not None:
         data["email"] = email
@@ -69,11 +84,5 @@ async def update_user(user_id: str, email: Optional[str], password: Optional[str
             detail="No fields to update"
         )
 
-    result = supabase.table("users").update(data).eq("id", user_id).execute()
-    if not result.data:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
-
+    supabase.table("users").update(data).eq("id", user_id).execute()
     return {"message": "User updated successfully"}
