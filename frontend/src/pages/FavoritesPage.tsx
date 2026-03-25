@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Trash2, ExternalLink, Star } from 'lucide-react'
 import { toast } from 'sonner'
+import { Link } from 'react-router-dom'
 
 function FavoritesPage() {
   const { logout } = useAuth()
@@ -104,16 +105,21 @@ function FavoritesPage() {
             return (
               <div key={f.id} className="group rounded-xl border border-border bg-card p-4 flex gap-4 items-center hover:border-primary/50 transition-colors">
                 {g && (
-                  <img
-                    src={g.image}
-                    alt={g.title}
-                    className="w-24 h-16 object-cover rounded-lg shrink-0"
-                  />
+                  <Link to={`/giveaways/${g.id}`}>
+                    <img
+                      src={g.image}
+                      alt={g.title}
+                      className="w-24 h-16 object-cover rounded-lg shrink-0 hover:opacity-80 transition-opacity"
+                    />
+                  </Link>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-foreground truncate">
-                    {g ? g.title : `Giveaway #${f.giveaway_id}`}
-                  </p>
+                  <Link to={g ? `/giveaways/${g.id}` : '#'} className="hover:text-primary transition-colors">
+                    <p className="font-medium text-sm text-foreground truncate">
+                      {g ? g.title : `Giveaway #${f.giveaway_id}`}
+                    </p>
+                  </Link>
+                  
                   {g && (
                     <p className="text-xs text-muted-foreground mt-0.5">{g.platforms}</p>
                   )}

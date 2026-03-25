@@ -102,6 +102,13 @@ function GiveawayDetailPage() {
             Ends {new Date(giveaway.end_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </p>
         )}
+
+        {giveaway.users > 0 && (
+          <p className="text-sm text-muted-foreground flex items-center gap-1">
+            <Users className="w-3 h-3" />
+            {giveaway.users.toLocaleString()}+ claimed
+          </p>
+        )}
       </div>
 
       {/* Claim + Save */}

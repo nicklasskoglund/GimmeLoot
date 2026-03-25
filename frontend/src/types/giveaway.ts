@@ -10,4 +10,5 @@ export interface Giveaway {
     status: string
     instructions: string
     type: string
+    users: number
 }
