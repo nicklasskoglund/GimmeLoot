@@ -2,37 +2,111 @@ import { useAuth } from '../context/AuthContext'
 import { addFavorite } from '../api/favorites'
 import { useState } from 'react'
 import type { Giveaway } from '../types/giveaway'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Star, ExternalLink, Loader2, Clock } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface GiveawayCardProps {
-    giveaway: Giveaway
+  giveaway: Giveaway
+  initialSaved?: boolean
 }
 
 
-function GiveawayCard({ giveaway }: GiveawayCardProps) {
-    const { user } = useAuth()
-    const [added, setAdded] = useState(false)
+function formatEndDate(dateStr: string): string | null {
+  if (!dateStr || dateStr === 'N/A') return null
+  const end = new Date(dateStr)
+  const now = new Date()
+  const diffMs = end.getTime() - now.getTime()
+  if (diffMs <= 0) return 'Expired'
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+  if (diffDays === 1) return 'Ends tomorrow'
+  if (diffDays <= 7) return `Ends in ${diffDays} days`
+  return `Ends ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+}
 
-    const handleAddFavorite = async () => {
-        await addFavorite(giveaway.id)
-        setAdded(true)
+
+function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
+  const [added, setAdded] = useState(initialSaved)
+  const { user } = useAuth()
+  const [loading, setLoading] = useState(false)
+
+  const handleAddFavorite = async () => {
+    setLoading(true)
+    try {
+      await addFavorite(giveaway.id)
+      setAdded(true)
+      toast.success('Saved to favorites!')
+    } catch {
+      toast.error('Failed to save. Try again.')
+    } finally {
+      setLoading(false)
     }
+  }
 
-    return (
-        <div>
-            <img src={giveaway.image} alt={giveaway.title} />
-            <h2>{giveaway.title}</h2>
-            <p>{giveaway.platforms}</p>
-            <p>{giveaway.worth}</p>
-            <a href={giveaway.open_giveaway_url} target='_blank' rel='noreferrer'>
-                Claim giveaway
-            </a>
-            {user && (
-                <button onClick={handleAddFavorite} disabled={added}>
-                    {added ? 'Added!' : 'Add to favorites'}
-                </button>
-            )}
+  return (
+    <div className="group flex flex-col rounded-xl border border-border bg-card text-card-foreground overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+      <div className="relative overflow-hidden aspect-video">
+        <img
+          src={giveaway.image}
+          alt={giveaway.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        {formatEndDate(giveaway.end_date) && (
+          <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-semibold flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {formatEndDate(giveaway.end_date)}
+          </Badge>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-3 p-4 flex-1">
+        <h2 className="font-semibold text-sm leading-snug line-clamp-2 text-foreground">
+          {giveaway.title}
+        </h2>
+
+        {giveaway.worth && giveaway.worth !== 'N/A' && (
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs text-green-500 border-green-500/30">Free</Badge>
+            <span className="text-xs text-muted-foreground line-through">{giveaway.worth}</span>
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-1">
+          {giveaway.platforms.split(',').map(platform => (
+            <Badge key={platform.trim()} variant="secondary" className="text-xs">
+              {platform.trim()}
+            </Badge>
+          ))}
         </div>
-    )
+
+        <div className="flex gap-2 mt-auto pt-2">
+          <Button variant="outline" size="sm" className="flex-1" asChild>
+            <a href={giveaway.open_giveaway_url} target='_blank' rel='noreferrer'>
+              <ExternalLink className="w-3 h-3 mr-1" />
+              Claim
+            </a>
+          </Button>
+
+          {user && (
+            <Button
+              size="sm"
+              variant={added ? 'secondary' : 'default'}
+              onClick={handleAddFavorite}
+              disabled={added || loading}
+              className="flex-1"
+            >
+              {loading
+                ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                : <Star className={`w-3 h-3 mr-1 ${added ? 'fill-current' : ''}`} />
+              }
+              {loading ? 'Saving...' : added ? 'Saved!' : 'Save'}
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default GiveawayCard
