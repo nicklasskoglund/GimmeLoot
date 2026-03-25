@@ -4,7 +4,7 @@ import { useState } from 'react'
 import type { Giveaway } from '../types/giveaway'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Star, ExternalLink } from 'lucide-react'
+import { Star, ExternalLink, Loader2 } from 'lucide-react'
 
 interface GiveawayCardProps {
   giveaway: Giveaway
@@ -67,8 +67,11 @@ function GiveawayCard({ giveaway }: GiveawayCardProps) {
               disabled={added || loading}
               className="flex-1"
             >
-              <Star className={`w-3 h-3 mr-1 ${added ? 'fill-current' : ''}`} />
-              {loading ? 'Adding...' : added ? 'Saved!' : 'Save'}
+              {loading
+                ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                : <Star className={`w-3 h-3 mr-1 ${added ? 'fill-current' : ''}`} />
+              }
+              {loading ? 'Saving...' : added ? 'Saved!' : 'Save'}
             </Button>
           )}
         </div>

@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext"
 import { registerUser } from "../api/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Gamepad2 } from "lucide-react"
+import { Gamepad2, Loader2 } from 'lucide-react'
 
 
 export default function RegisterPage() {
@@ -67,6 +67,7 @@ export default function RegisterPage() {
             </div>
 
             <Button type="submit" className="w-full mt-2" disabled={loading}>
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {loading ? 'Creating account...' : 'Create account'}
             </Button>
 

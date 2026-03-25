@@ -3,6 +3,7 @@ import { updateUser } from '../api/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Settings } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
 
 function AccountPage() {
@@ -98,6 +99,7 @@ function AccountPage() {
             {message && <p className="text-xs text-green-500">{message}</p>}
 
             <Button type="submit" className="w-full mt-2" disabled={loading}>
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {loading ? 'Saving...' : 'Save changes'}
             </Button>
 
