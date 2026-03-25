@@ -1,74 +1,112 @@
 import { useState } from 'react'
 import { updateUser } from '../api/auth'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Settings } from 'lucide-react'
 
 
 function AccountPage() {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [currentPassword, setCurrentPassword] = useState('')
-    const [message, setMessage] = useState<string | null>(null)
-    const [error, setError] = useState<string | null>(null)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [message, setMessage] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-    const handleSubmit = async (e: React.SyntheticEvent) => {
-        e.preventDefault()
-        setMessage(null)
-        setError(null)
+  const handleSubmit = async (e: React.SyntheticEvent) => {
+    e.preventDefault()
+    setMessage(null)
+    setError(null)
 
-        const data: { current_password: string; email?: string; password?: string } = {
-            current_password: currentPassword
-        }
-        if (email) data.email = email
-        if (password) data.password = password
-
-        if (!currentPassword) {
-            setError('Please enter your current password.')
-            return
-        }
-
-        if (!email && !password) {
-            setError('Please fill in at least one field.')
-            return
-        }
-
-        try {
-            await updateUser(data)
-            setMessage('Account updated successfully.')
-            setEmail('')
-            setPassword('')
-            setCurrentPassword('')
-        } catch {
-            setError('Failed to update account.')
-        }
+    if (!currentPassword) {
+      setError('Please enter your current password.')
+      return
+    }
+    if (!email && !password) {
+      setError('Please fill in at least one field to update.')
+      return
     }
 
-    return (
-        <div>
-            <h1>Account Settings</h1>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type='password'
-                    placeholder='Current password'
-                    value={currentPassword}
-                    onChange={e => setCurrentPassword(e.target.value)}
-                />
-                <input
-                    type='email'
-                    placeholder='New email'
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                />
-                <input
-                    type='password'
-                    placeholder='New password'
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                />
-                <button type='submit'>Update</button>
-            </form>
-            {message && <p>{message}</p>}
-            {error && <p>{error}</p>}
+    const data: { current_password: string; email?: string; password?: string } = {
+      current_password: currentPassword
+    }
+    if (email) data.email = email
+    if (password) data.password = password
+
+    setLoading(true)
+    try {
+      await updateUser(data)
+      setMessage('Account updated successfully.')
+      setEmail('')
+      setPassword('')
+      setCurrentPassword('')
+    } catch {
+      setError('Failed to update account. Check your current password.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
+      <div className="w-full max-w-sm flex flex-col gap-6">
+
+        <div className="flex flex-col items-center gap-2 text-center">
+          <Settings className="w-8 h-8 text-primary" />
+          <h1 className="text-2xl font-bold tracking-tight">Account Settings</h1>
+          <p className="text-sm text-muted-foreground">Update your email or password</p>
         </div>
-    )
+
+        <div className="rounded-xl border border-border bg-card p-6 flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-foreground">Current password</label>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                value={currentPassword}
+                onChange={e => setCurrentPassword(e.target.value)}
+              />
+            </div>
+
+            <div className="border-t border-border pt-4 flex flex-col gap-4">
+              <p className="text-xs text-muted-foreground">Fill in one or both fields below to update</p>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-foreground">New email</label>
+                <Input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-foreground">New password</label>
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {error && <p className="text-xs text-destructive">{error}</p>}
+            {message && <p className="text-xs text-green-500">{message}</p>}
+
+            <Button type="submit" className="w-full mt-2" disabled={loading}>
+              {loading ? 'Saving...' : 'Save changes'}
+            </Button>
+
+          </form>
+        </div>
+
+      </div>
+    </div>
+  )
 }
 
 export default AccountPage
