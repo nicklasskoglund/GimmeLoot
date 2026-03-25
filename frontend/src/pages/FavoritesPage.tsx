@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react'
-import { useAuth } from '../context/AuthContext'
 import { getFavorites, removeFavorite } from '../api/favorites'
 import type { Favorite } from '../api/favorites'
 import { getGiveaway } from '../api/giveaways'
 import type { Giveaway } from '../types/giveaway'
-import { deleteUser } from '../api/auth'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Trash2, ExternalLink, Star } from 'lucide-react'
@@ -12,7 +10,6 @@ import { toast } from 'sonner'
 import { Link } from 'react-router-dom'
 
 function FavoritesPage() {
-  const { logout } = useAuth()
   const navigate = useNavigate()
   const [favorites, setFavorites] = useState<Favorite[]>([])
   const [loading, setLoading] = useState(true)
@@ -44,18 +41,6 @@ function FavoritesPage() {
       toast.success('Removed from favorites')
     } catch {
       toast.error('Failed to remove. Try again.')
-    }
-  }
-
-  const handleDeleteAccount = async () => {
-    if (!confirm('Are you sure you want to delete your account?')) return
-    try {
-      await deleteUser()
-      logout()
-      navigate('/login')
-      toast.success('Account deleted')
-    } catch {
-      toast.error('Failed to delete account.')
     }
   }
 
@@ -148,11 +133,6 @@ function FavoritesPage() {
         </div>
       )}
 
-      <div className="border-t border-border pt-6 mt-4">
-        <Button variant="ghost" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={handleDeleteAccount}>
-          Delete account
-        </Button>
-      </div>
     </div>
   )
 }
