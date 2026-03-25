@@ -1,5 +1,6 @@
 import { ThemeProvider } from './context/ThemeContext'
 import { Routes, Route } from 'react-router-dom'
+import { Toaster } from '@/components/ui/sonner'
 import GiveawaysPage from './pages/GiveawaysPage'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
@@ -32,6 +33,7 @@ function App() {
           </Routes>
         </main>
       </div>
+      <Toaster position="top-right" richColors />
     </ThemeProvider>
   )
 }

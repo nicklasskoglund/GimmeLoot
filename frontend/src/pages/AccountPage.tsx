@@ -4,19 +4,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Settings } from 'lucide-react'
 import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 
 function AccountPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
-  const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
-    setMessage(null)
     setError(null)
 
     if (!currentPassword) {
@@ -37,7 +36,7 @@ function AccountPage() {
     setLoading(true)
     try {
       await updateUser(data)
-      setMessage('Account updated successfully.')
+      toast.success('Account updated!')
       setEmail('')
       setPassword('')
       setCurrentPassword('')
@@ -96,7 +95,6 @@ function AccountPage() {
             </div>
 
             {error && <p className="text-xs text-destructive">{error}</p>}
-            {message && <p className="text-xs text-green-500">{message}</p>}
 
             <Button type="submit" className="w-full mt-2" disabled={loading}>
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}

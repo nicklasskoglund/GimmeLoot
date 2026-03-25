@@ -8,6 +8,7 @@ import { deleteUser } from '../api/auth'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Trash2, ExternalLink, Star } from 'lucide-react'
+import { toast } from 'sonner'
 
 function FavoritesPage() {
   const { logout } = useAuth()
@@ -36,15 +37,25 @@ function FavoritesPage() {
   }, [])
 
   const handleRemove = async (giveawayId: number) => {
-    await removeFavorite(giveawayId)
-    setFavorites(prev => prev.filter(f => f.giveaway_id !== giveawayId))
+    try {
+      await removeFavorite(giveawayId)
+      setFavorites(prev => prev.filter(f => f.giveaway_id !== giveawayId))
+      toast.success('Removed from favorites')
+    } catch {
+      toast.error('Failed to remove. Try again.')
+    }
   }
 
   const handleDeleteAccount = async () => {
     if (!confirm('Are you sure you want to delete your account?')) return
-    await deleteUser()
-    logout()
-    navigate('/login')
+    try {
+      await deleteUser()
+      logout()
+      navigate('/login')
+      toast.success('Account deleted')
+    } catch {
+      toast.error('Failed to delete account.')
+    }
   }
 
   return (

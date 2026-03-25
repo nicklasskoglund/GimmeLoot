@@ -5,6 +5,7 @@ import type { Giveaway } from '../types/giveaway'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Star, ExternalLink, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface GiveawayCardProps {
   giveaway: Giveaway
@@ -18,9 +19,15 @@ function GiveawayCard({ giveaway }: GiveawayCardProps) {
 
   const handleAddFavorite = async () => {
     setLoading(true)
-    await addFavorite(giveaway.id)
-    setAdded(true)
-    setLoading(false)
+    try {
+      await addFavorite(giveaway.id)
+      setAdded(true)
+      toast.success('Saved to favorites!')
+    } catch {
+      toast.error('Failed to save. Try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
