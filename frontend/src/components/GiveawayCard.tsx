@@ -4,12 +4,25 @@ import { useState } from 'react'
 import type { Giveaway } from '../types/giveaway'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Star, ExternalLink, Loader2 } from 'lucide-react'
+import { Star, ExternalLink, Loader2, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface GiveawayCardProps {
   giveaway: Giveaway
   initialSaved?: boolean
+}
+
+
+function formatEndDate(dateStr: string): string | null {
+  if (!dateStr || dateStr === 'N/A') return null
+  const end = new Date(dateStr)
+  const now = new Date()
+  const diffMs = end.getTime() - now.getTime()
+  if (diffMs <= 0) return 'Expired'
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+  if (diffDays === 1) return 'Ends tomorrow'
+  if (diffDays <= 7) return `Ends in ${diffDays} days`
+  return `Ends ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
 }
 
 
@@ -39,9 +52,10 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
           alt={giveaway.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        {giveaway.worth && giveaway.worth !== 'N/A' && (
-          <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-semibold">
-            {giveaway.worth}
+        {formatEndDate(giveaway.end_date) && (
+          <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-semibold flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {formatEndDate(giveaway.end_date)}
           </Badge>
         )}
       </div>
@@ -50,6 +64,13 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
         <h2 className="font-semibold text-sm leading-snug line-clamp-2 text-foreground">
           {giveaway.title}
         </h2>
+
+        {giveaway.worth && giveaway.worth !== 'N/A' && (
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs text-green-500 border-green-500/30">Free</Badge>
+            <span className="text-xs text-muted-foreground line-through">{giveaway.worth}</span>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-1">
           {giveaway.platforms.split(',').map(platform => (
