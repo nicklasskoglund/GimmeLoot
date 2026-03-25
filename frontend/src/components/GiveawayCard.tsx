@@ -9,12 +9,13 @@ import { toast } from 'sonner'
 
 interface GiveawayCardProps {
   giveaway: Giveaway
+  initialSaved?: boolean
 }
 
 
-function GiveawayCard({ giveaway }: GiveawayCardProps) {
+function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
+  const [added, setAdded] = useState(initialSaved)
   const { user } = useAuth()
-  const [added, setAdded] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleAddFavorite = async () => {

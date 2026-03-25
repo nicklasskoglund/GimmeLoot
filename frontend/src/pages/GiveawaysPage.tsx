@@ -3,6 +3,8 @@ import type { Giveaway } from '../types/giveaway'
 import { getGiveaways, searchGiveaways } from '../api/giveaways'
 import GiveawayList from '../components/GiveawayList'
 import SearchBar from '../components/SearchBar'
+import { useAuth } from '../context/AuthContext'
+import { getFavorites } from '../api/favorites'
 
 
 function GiveawaysPage() {
@@ -10,6 +12,13 @@ function GiveawaysPage() {
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { user } = useAuth()
+  const [savedIds, setSavedIds] = useState<number[]>([])
+
+  useEffect(() => {
+    if (!user) return
+    getFavorites().then(favs => setSavedIds(favs.map(f => f.giveaway_id)))
+  }, [user])
 
   useEffect(() => {
     const fetchGiveaways = async () => {
@@ -65,7 +74,7 @@ function GiveawaysPage() {
         </div>
       )}
 
-      {!loading && !error && <GiveawayList giveaways={giveaways} />}
+      {!loading && !error && <GiveawayList giveaways={giveaways} savedIds={savedIds} />}
     </div>
   )
 }
