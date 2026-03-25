@@ -8,4 +8,7 @@ export interface Giveaway {
     platforms: string
     end_date: string
     status: string
+    instructions: string
+    type: string
+    users: number
 }

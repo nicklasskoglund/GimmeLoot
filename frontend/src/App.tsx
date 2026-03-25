@@ -2,6 +2,7 @@ import { ThemeProvider } from './context/ThemeContext'
 import { Routes, Route } from 'react-router-dom'
 import { Toaster } from '@/components/ui/sonner'
 import GiveawaysPage from './pages/GiveawaysPage'
+import GiveawayDetailPage from './pages/GiveawayDetailPage'
 import RegisterPage from './pages/RegisterPage'
 import LoginPage from './pages/LoginPage'
 import FavoritesPage from './pages/FavoritesPage'
@@ -18,6 +19,7 @@ function App() {
         <main className="max-w-7xl mx-auto px-4 py-8">
           <Routes>
             <Route path='/' element={<GiveawaysPage />} />
+            <Route path='/giveaways/:id' element={<GiveawayDetailPage />} />
             <Route path='/register' element={<RegisterPage />} />
             <Route path='/login' element={<LoginPage />} />
             <Route path='/favorites' element={

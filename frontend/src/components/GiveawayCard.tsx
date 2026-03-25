@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Star, ExternalLink, Loader2, Clock } from 'lucide-react'
 import { toast } from 'sonner'
+import { Link } from 'react-router-dom'
 
 interface GiveawayCardProps {
   giveaway: Giveaway
   initialSaved?: boolean
 }
-
 
 function formatEndDate(dateStr: string): string | null {
   if (!dateStr || dateStr === 'N/A') return null
@@ -24,7 +24,6 @@ function formatEndDate(dateStr: string): string | null {
   if (diffDays <= 7) return `Ends in ${diffDays} days`
   return `Ends ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
 }
-
 
 function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
   const [added, setAdded] = useState(initialSaved)
@@ -45,25 +44,30 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
   }
 
   return (
-    <div className="group flex flex-col rounded-xl border border-border bg-card text-card-foreground overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
-      <div className="relative overflow-hidden aspect-video">
-        <img
-          src={giveaway.image}
-          alt={giveaway.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-        {formatEndDate(giveaway.end_date) && (
-          <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-semibold flex items-center gap-1">
-            <Clock className="w-3 h-3" />
-            {formatEndDate(giveaway.end_date)}
-          </Badge>
-        )}
-      </div>
+    <div className="flex flex-col rounded-xl border border-border bg-card text-card-foreground overflow-hidden hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+
+      <Link to={`/giveaways/${giveaway.id}`} className="group">
+        <div className="relative overflow-hidden aspect-video">
+          <img
+            src={giveaway.image}
+            alt={giveaway.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+          {formatEndDate(giveaway.end_date) && (
+            <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-semibold flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {formatEndDate(giveaway.end_date)}
+            </Badge>
+          )}
+        </div>
+      </Link>
 
       <div className="flex flex-col gap-3 p-4 flex-1">
-        <h2 className="font-semibold text-sm leading-snug line-clamp-2 text-foreground">
-          {giveaway.title}
-        </h2>
+        <Link to={`/giveaways/${giveaway.id}`} className="hover:text-primary transition-colors">
+          <h2 className="font-semibold text-sm leading-snug line-clamp-2 text-foreground">
+            {giveaway.title}
+          </h2>
+        </Link>
 
         {giveaway.worth && giveaway.worth !== 'N/A' && (
           <div className="flex items-center gap-2">
