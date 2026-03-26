@@ -9,12 +9,14 @@ interface LoginPayload {
 interface RegisterPayload {
     email: string
     password: string
+    username: string
 }
 
 interface AuthResponse {
     message: string
     user_id: string
     access_token: string
+    username: string
 }
 
 export async function loginUser(payload: LoginPayload) {
@@ -34,6 +36,6 @@ export async function deleteUser() {
 }
 
 
-export async function updateUser(data: { current_password: string; email?: string; password?: string }): Promise<void> {
+export async function updateUser(data: { current_password: string; email?: string; password?: string; username?: string }): Promise<void> {
     await client.put("/auth/user", data)
 }
