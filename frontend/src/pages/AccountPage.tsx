@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { updateUser, deleteUser } from '../api/auth'
+import { updateUser as updateUserApi, deleteUser } from '../api/auth'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,7 @@ function AccountPage() {
   const [username, setUsername] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const { logout } = useAuth()
+  const { logout, updateUser } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
@@ -36,8 +36,9 @@ function AccountPage() {
     if (username) data.username = username
     setLoading(true)
     try {
-      await updateUser(data)
+      await updateUserApi(data)
       toast.success('Account updated!')
+      if (username) updateUser({ username })
       setEmail('')
       setPassword('')
       setCurrentPassword('')
