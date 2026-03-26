@@ -27,6 +27,9 @@ function Navbar() {
         <div className="flex items-center gap-2">
           {user ? (
             <>
+              <span className="text-sm text-muted-foreground px-2 hidden sm:block">
+                @{user.username}
+              </span>
               <Button variant="ghost" asChild>
                 <Link to='/favorites'>My Favorites</Link>
               </Button>
