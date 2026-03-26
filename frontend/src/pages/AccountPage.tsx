@@ -11,6 +11,7 @@ function AccountPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
+  const [username, setUsername] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const { logout } = useAuth()
@@ -23,15 +24,16 @@ function AccountPage() {
       setError('Please enter your current password.')
       return
     }
-    if (!email && !password) {
+    if (!email && !password && !username) {
       setError('Please fill in at least one field to update.')
       return
     }
-    const data: { current_password: string; email?: string; password?: string } = {
+    const data: { current_password: string; email?: string; password?: string; username?: string } = {
       current_password: currentPassword
     }
     if (email) data.email = email
     if (password) data.password = password
+    if (username) data.username = username
     setLoading(true)
     try {
       await updateUser(data)
@@ -39,6 +41,7 @@ function AccountPage() {
       setEmail('')
       setPassword('')
       setCurrentPassword('')
+      setUsername('')
     } catch {
       setError('Failed to update account. Check your current password.')
     } finally {
@@ -79,8 +82,19 @@ function AccountPage() {
                 onChange={e => setCurrentPassword(e.target.value)}
               />
             </div>
+
             <div className="border-t border-border pt-4 flex flex-col gap-4">
               <p className="text-xs text-muted-foreground">Fill in one or both fields below to update</p>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-foreground">New username</label>
+                <Input
+                  type="text"
+                  placeholder="coolplayer99"
+                  value={username}
+                  onChange={e => setUsername(e.target.value)}
+                />
+              </div>
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-foreground">New email</label>
                 <Input
@@ -90,6 +104,7 @@ function AccountPage() {
                   onChange={e => setEmail(e.target.value)}
                 />
               </div>
+              
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-foreground">New password</label>
                 <Input
