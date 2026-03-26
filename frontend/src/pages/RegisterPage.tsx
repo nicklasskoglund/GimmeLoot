@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
@@ -20,7 +21,7 @@ export default function RegisterPage() {
     setError(null)
     setLoading(true)
     try {
-      const result = await registerUser({ email, password })
+      const result = await registerUser({ email, password, username })
       login(result)
       navigate('/')
     } catch {
@@ -50,6 +51,17 @@ export default function RegisterPage() {
                 placeholder="you@example.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-foreground">Username</label>
+              <Input
+                type="text"
+                placeholder="coolplayer99"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
                 required
               />
             </div>
