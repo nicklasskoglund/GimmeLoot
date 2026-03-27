@@ -1,5 +1,5 @@
 import { useAuth } from '../context/AuthContext'
-import { addFavorite } from '../api/favorites'
+import { addFavorite, removeFavorite } from '../api/favorites'
 import { useState } from 'react'
 import type { Giveaway } from '../types/giveaway'
 import { Button } from '@/components/ui/button'
@@ -29,15 +29,23 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
   const [added, setAdded] = useState(initialSaved)
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
+  const endDateLabel = formatEndDate(giveaway.end_date)
+  const isExpired = endDateLabel === 'Expired'
 
-  const handleAddFavorite = async () => {
+  const handleToggleFavorite = async () => {
     setLoading(true)
     try {
-      await addFavorite(giveaway.id)
-      setAdded(true)
-      toast.success('Saved to favorites!')
+      if (added) {
+        await removeFavorite(giveaway.id)
+        setAdded(false)
+        toast.success('Removed from favorites.')
+      } else {
+        await addFavorite(giveaway.id)
+        setAdded(true)
+        toast.success('Saved to favorites!')
+      }
     } catch {
-      toast.error('Failed to save. Try again.')
+      toast.error('Something went wrong. Try again.')
     } finally {
       setLoading(false)
     }
@@ -52,11 +60,18 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
             src={giveaway.image}
             alt={giveaway.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            style={isExpired ? { filter: 'grayscale(50%)', opacity: 0.2 } : undefined}
           />
-          {formatEndDate(giveaway.end_date) && (
-            <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-semibold flex items-center gap-1">
+          {endDateLabel && (
+            <Badge
+              className="absolute top-2 right-2 font-semibold flex items-center gap-1"
+              style={isExpired
+                ? { backgroundColor: 'var(--card)', color: 'var(--primary)', border: '1px solid var(--primary)' }
+                : { backgroundColor: 'var(--primary)', color: 'var(--primary-foreground)' }
+              }
+            >
               <Clock className="w-3 h-3" />
-              {formatEndDate(giveaway.end_date)}
+              {endDateLabel}
             </Badge>
           )}
         </div>
@@ -96,15 +111,15 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
             <Button
               size="sm"
               variant={added ? 'secondary' : 'default'}
-              onClick={handleAddFavorite}
-              disabled={added || loading}
+              onClick={handleToggleFavorite}
+              disabled={loading}
               className="flex-1"
             >
               {loading
                 ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                 : <Star className={`w-3 h-3 mr-1 ${added ? 'fill-current' : ''}`} />
               }
-              {loading ? 'Saving...' : added ? 'Saved!' : 'Save'}
+              {loading ? 'Loading...' : added ? 'Saved' : 'Save'}
             </Button>
           )}
         </div>
