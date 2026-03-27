@@ -9,6 +9,7 @@ import FavoritesPage from './pages/FavoritesPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import AccountPage from './pages/AccountPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
                 <AccountPage />
               </ProtectedRoute>
             } />
+            <Route path='*' element={<NotFoundPage />} />
           </Routes>
         </main>
       </div>
