@@ -1,5 +1,5 @@
 import { useAuth } from '../context/AuthContext'
-import { addFavorite } from '../api/favorites'
+import { addFavorite, removeFavorite } from '../api/favorites'
 import { useState } from 'react'
 import type { Giveaway } from '../types/giveaway'
 import { Button } from '@/components/ui/button'
@@ -32,14 +32,20 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
   const endDateLabel = formatEndDate(giveaway.end_date)
   const isExpired = endDateLabel === 'Expired'
 
-  const handleAddFavorite = async () => {
+  const handleToggleFavorite = async () => {
     setLoading(true)
     try {
-      await addFavorite(giveaway.id)
-      setAdded(true)
-      toast.success('Saved to favorites!')
+      if (added) {
+        await removeFavorite(giveaway.id)
+        setAdded(false)
+        toast.success('Removed from favorites.')
+      } else {
+        await addFavorite(giveaway.id)
+        setAdded(true)
+        toast.success('Saved to favorites!')
+      }
     } catch {
-      toast.error('Failed to save. Try again.')
+      toast.error('Something went wrong. Try again.')
     } finally {
       setLoading(false)
     }
@@ -105,15 +111,15 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
             <Button
               size="sm"
               variant={added ? 'secondary' : 'default'}
-              onClick={handleAddFavorite}
-              disabled={added || loading}
+              onClick={handleToggleFavorite}
+              disabled={loading}
               className="flex-1"
             >
               {loading
                 ? <Loader2 className="w-3 h-3 mr-1 animate-spin" />
                 : <Star className={`w-3 h-3 mr-1 ${added ? 'fill-current' : ''}`} />
               }
-              {loading ? 'Saving...' : added ? 'Saved!' : 'Save'}
+              {loading ? 'Loading...' : added ? 'Saved' : 'Save'}
             </Button>
           )}
         </div>

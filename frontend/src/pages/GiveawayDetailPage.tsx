@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import type { Giveaway } from '../types/giveaway'
 import { getGiveaway } from '../api/giveaways'
 import { useAuth } from '../context/AuthContext'
-import { addFavorite, getFavorites } from '../api/favorites'
+import { addFavorite, getFavorites, removeFavorite } from '../api/favorites'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, ExternalLink, Star, Loader2, Clock, Users } from 'lucide-react'
@@ -48,18 +48,24 @@ function GiveawayDetailPage() {
         : 'Instructions'
 
 
-    const handleSave = async () => {
-        if (!giveaway) return
-        setSaving(true)
-        try {
-        await addFavorite(giveaway.id)
-        setSaved(true)
-        toast.success('Saved to favorites!')
-        } catch {
-        toast.error('Failed to save. Try again.')
-        } finally {
-        setSaving(false)
+    const handleToggleFavorite = async () => {
+      if (!giveaway) return
+      setSaving(true)
+      try {
+        if (saved) {
+          await removeFavorite(giveaway.id)
+          setSaved(false)
+          toast.success('Removed from favorites.')
+        } else {
+          await addFavorite(giveaway.id)
+          setSaved(true)
+          toast.success('Saved to favorites!')
         }
+      } catch {
+        toast.error('Something went wrong. Try again.')
+      } finally {
+        setSaving(false)
+      }
     }
 
   if (loading) return (
@@ -132,9 +138,9 @@ function GiveawayDetailPage() {
           </a>
         </Button>
         {user && (
-          <Button variant={saved ? 'secondary' : 'outline'} disabled={saved || saving} onClick={handleSave}>
+          <Button variant={saved ? 'secondary' : 'default'} disabled={saving} onClick={handleToggleFavorite}>
             {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Star className={`w-4 h-4 mr-2 ${saved ? 'fill-current' : ''}`} />}
-            {saving ? 'Saving...' : saved ? 'Saved!' : 'Save'}
+            {saving ? 'Loading...' : saved ? 'Saved' : 'Save'}
           </Button>
         )}
       </div>
