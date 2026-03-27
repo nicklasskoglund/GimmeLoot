@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import type { Giveaway } from '../types/giveaway'
 import { getGiveaway } from '../api/giveaways'
 import { useAuth } from '../context/AuthContext'
-import { addFavorite } from '../api/favorites'
+import { addFavorite, getFavorites } from '../api/favorites'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, ExternalLink, Star, Loader2, Clock, Users } from 'lucide-react'
@@ -22,11 +22,24 @@ function GiveawayDetailPage() {
 
   useEffect(() => {
     if (!id) return
-    getGiveaway(Number(id))
-      .then(setGiveaway)
-      .catch(() => setError('Failed to load giveaway.'))
-      .finally(() => setLoading(false))
-  }, [id])
+    const fetchData = async () => {
+      try {
+        const [giveawayData, favData] = await Promise.all([
+          getGiveaway(Number(id)),
+          user ? getFavorites() : Promise.resolve([])
+        ])
+        setGiveaway(giveawayData)
+        if (favData.some(f => f.giveaway_id === Number(id))) {
+          setSaved(true)
+        }
+      } catch {
+        setError('Failed to load giveaway.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [id, user])
 
 
     const instructionTitle = giveaway?.type?.toLowerCase().includes('loot') ||
