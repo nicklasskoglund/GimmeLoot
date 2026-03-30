@@ -1,6 +1,9 @@
 # .gitleaks.toml
 title = "GimmeLoot Gitleaks Config"
 
+[allowlist]
+paths = [".secrets.baseline"]
+
 [extend]
 useDefault = true
 
