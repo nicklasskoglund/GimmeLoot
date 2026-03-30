@@ -222,3 +222,6 @@ Desktop.ini
 .env.production
 .env.test
 .env.*.local
+
+# Safety
+.safety-project.ini
