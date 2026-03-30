@@ -1,0 +1,25 @@
+# .gitleaks.toml
+title = "GimmeLoot Gitleaks Config"
+
+[allowlist]
+paths = [".secrets.baseline"]
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "hardcoded-localhost"
+description = "Hardcoded localhost URL in source code"
+regex = '''https?://(localhost|127\.0\.0\.1)(:\d+)?'''
+tags = ["localhost", "hardcoded"]
+[rules.allowlist]
+paths = [
+    "frontend/cypress.config.ts",
+    ".gitleaks.toml"
+]
+
+[[rules]]
+id = "hardcoded-supabase-url"
+description = "Hardcoded Supabase project URL"
+regex = '''https://[a-z0-9]+\.supabase\.co'''
+tags = ["supabase", "hardcoded"]

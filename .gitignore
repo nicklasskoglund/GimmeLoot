@@ -205,3 +205,23 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Editor directories
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Additional .env variants
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*.local
+
+# Safety
+.safety-project.ini

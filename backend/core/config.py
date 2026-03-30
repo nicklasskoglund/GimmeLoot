@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 60
 
-    allowed_origins_str: str = "http://localhost:5173"
+    allowed_origins_str: str
     supabase_url: str
     supabase_key: str
     gamerpower_base_url: str
