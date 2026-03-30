@@ -1,4 +1,5 @@
 import jwt
+import logging
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -8,6 +9,7 @@ from typing import Optional
 
 from backend.core.config import settings
 
+logger = logging.getLogger(__name__)
 security = HTTPBearer()
 
 
@@ -28,10 +30,10 @@ def decode_access_token(token: str) -> Optional[dict]:
         payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
         return payload
     except jwt.ExpiredSignatureError:
-        print('Token has expired')
+        logger.warning("Token has expired")
         return None
     except jwt.InvalidTokenError:
-        print ('Invalid token')
+        logger.warning("Invalid token")
         return None
     
 
