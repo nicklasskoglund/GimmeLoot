@@ -81,7 +81,7 @@ def test_update_user_success(client, mock_supabase, auth_override):
     ]
     mock_supabase.table.return_value.update.return_value.eq.return_value.execute.return_value.data = [{"id": "user-1"}]
 
-    response = client.put("/api/v1/auth/user", json={
+    response = client.patch("/api/v1/auth/user", json={
         "current_password": "oldpass",
         "email": "new@example.com"
     })
