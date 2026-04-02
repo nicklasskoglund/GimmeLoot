@@ -1,13 +1,16 @@
-# 🎁 GimmeLoot
+<br/><br/>
+<div align="center">
+  <img src="./assets/gimmeloot-logo.png" width="110" alt="GimmeLoot logo" />
+  <br/>
+  <img src="./assets/gimmeloot-title.svg" width="260" alt="GimmeLoot" />
+  <br/><br/>
 
-<!-- Replace this line with your logo/banner image in v0.18.0 -->
-<!-- ![GimmeLoot Logo](./assets/logo.png) -->
-
-![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi)
-![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)
-![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase)
-![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python)
+  ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi)
+  ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
+  ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)
+  ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase)
+  ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python)
+</div>
 
 > A fullstack app for discovering free game giveaways — powered by the [GamerPower API](https://www.gamerpower.com/api-read).
 
