@@ -2,8 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/useTheme'
 import { Button } from '@/components/ui/button'
-import { Sun, Moon, Gamepad2 } from 'lucide-react'
-
+import { Sun, Moon } from 'lucide-react'
 
 function Navbar() {
   const { user, logout } = useAuth()
@@ -19,9 +18,19 @@ function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
-        <Link to='/' className="flex items-center gap-2 font-bold text-xl text-foreground hover:text-primary transition-colors">
-          <Gamepad2 className="w-6 h-6 text-primary" />
-          GimmeLoot
+        <Link to='/' className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <img
+            src="/gimmeloot-logo.png"
+            alt="GimmeLoot"
+            className="w-7 h-7 object-contain"
+            style={{ filter: 'drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000)' }}
+          />
+          <span
+            className="gl-gradient-text font-bold text-xl"
+            style={{ filter: 'drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000)' }}
+          >
+            GimmeLoot
+          </span>
         </Link>
 
         <div className="flex items-center gap-2">
