@@ -136,7 +136,7 @@
 }
 
 .gl-gradient-text {
-  background: linear-gradient(90deg, #f97316, #fbbf24, #fb923c, #fde68a, #f97316);
+  background: linear-gradient(90deg, var(--primary), #fbbf24, var(--primary), #fde68a, var(--primary));
   background-size: 300% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
