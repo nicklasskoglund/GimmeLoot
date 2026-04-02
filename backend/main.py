@@ -8,7 +8,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 # Local
-from backend.api.router import api_router
+from backend.routes.router import api_router
 from backend.middlewares.request_id import RequestIdMiddleware
 from backend.utils.logging import setup_logging
 from backend.services.cache import TTLCache
