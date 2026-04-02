@@ -19,8 +19,18 @@ function Navbar() {
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
 
         <Link to='/' className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <img src="/gimmeloot-logo.png" alt="GimmeLoot" className="w-7 h-7 object-contain" />
-          <span className="gl-gradient-text font-bold text-xl">GimmeLoot</span>
+          <img
+            src="/gimmeloot-logo.png"
+            alt="GimmeLoot"
+            className="w-7 h-7 object-contain"
+            style={{ filter: 'drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000)' }}
+          />
+          <span
+            className="gl-gradient-text font-bold text-xl"
+            style={{ filter: 'drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000)' }}
+          >
+            GimmeLoot
+          </span>
         </Link>
 
         <div className="flex items-center gap-2">
