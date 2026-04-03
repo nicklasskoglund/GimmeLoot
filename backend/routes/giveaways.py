@@ -41,11 +41,13 @@ async def list_giveaways(
         raw = await gp.get_giveaways(platform=platform, giveaway_type=giveaway_type, sort_by=sort_by)
     except RuntimeError as e:
         if 'Rate limit' in str(e):
-            return error_response(429, "rate_limit_exceeded", str(e), request)
-        return error_response(502, "upstream_error", str(e), request)
+            logger.warning('Rate limit exceeded: %s', e)
+            return error_response(429, "rate_limit_exceeded", "Too many requests, please try again later.", request)
+        logger.error('Upstream error: %s', e)
+        return error_response(502, "upstream_error", "Failed to fetch giveaways.", request)
     except Exception as e:
         logger.exception('Failed to fetch giveaways')
-        return error_response(502, "upstream_error", str(e), request)
+        return error_response(502, "upstream_error", "An unexpected error occurred.", request)
 
     items = [Giveaway(**g) for g in raw]
     logger.info('Upstream returned %d items', len(items))
@@ -85,11 +87,13 @@ async def search_giveaways(
         raw = await gp.get_giveaways(platform=platform)
     except RuntimeError as e:
         if 'Rate limit' in str(e):
-            return error_response(429, "rate_limit_exceeded", str(e), request)
-        return error_response(502, "upstream_error", str(e), request)
+            logger.warning('Rate limit exceeded: %s', e)
+            return error_response(429, "rate_limit_exceeded", "Too many requests, please try again later.", request)
+        logger.error('Upstream error: %s', e)
+        return error_response(502, "upstream_error", "Failed to fetch giveaways.", request)
     except Exception as e:
         logger.exception('Failed to fetch giveaways for search')
-        return error_response(502, "upstream_search_error", str(e), request)
+        return error_response(502, "upstream_search_error", "An unexpected error occurred.", request)
 
     items = [Giveaway(**g) for g in raw]
     needle = term.lower()
@@ -121,13 +125,17 @@ async def giveaway_details(
         raw = await gp.get_giveaway_by_id(giveaway_id)
         return raw
     except httpx.HTTPStatusError as e:
+        logger.error('Upstream HTTP error for giveaway %d: %s', giveaway_id, e)
         return error_response(e.response.status_code, "upstream_http_error", f"Upstream returned {e.response.status_code} for giveaway {giveaway_id}", request)
     except RuntimeError as e:
         if 'Rate limit' in str(e):
-            return error_response(429, "rate_limit_exceeded", str(e), request)
-        return error_response(502, "upstream_error", str(e), request)
+            logger.warning('Rate limit exceeded: %s', e)
+            return error_response(429, "rate_limit_exceeded", "Too many requests, please try again later.", request)
+        logger.error('Upstream error: %s', e)
+        return error_response(502, "upstream_error", "Failed to fetch giveaway.", request)
     except Exception as e:
-        return error_response(502, "upstream_giveaway_error", str(e), request)
+        logger.exception('Failed to fetch giveaway %d', giveaway_id)
+        return error_response(502, "upstream_giveaway_error", "An unexpected error occurred.", request)
 
 
 @router.post('/query', response_model=list[Giveaway])
@@ -144,11 +152,13 @@ async def query_giveaways(
         )
     except RuntimeError as e:
         if 'Rate limit' in str(e):
-            return error_response(429, "rate_limit_exceeded", str(e), request)
-        return error_response(502, "upstream_error", str(e), request)
+            logger.warning('Rate limit exceeded: %s', e)
+            return error_response(429, "rate_limit_exceeded", "Too many requests, please try again later.", request)
+        logger.error('Upstream error: %s', e)
+        return error_response(502, "upstream_error", "Failed to fetch giveaways.", request)
     except Exception as e:
         logger.exception('Failed to fetch giveaways for query')
-        return error_response(502, "upstream_query_error", str(e), request)
+        return error_response(502, "upstream_query_error", "An unexpected error occurred.", request)
 
     items = [Giveaway(**g) for g in raw]
     logger.info('Upstream returned %d items', len(items))
