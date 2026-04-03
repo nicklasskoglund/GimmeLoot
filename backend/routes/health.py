@@ -1,5 +1,7 @@
+import logging
 from fastapi import APIRouter, Request
 
+logger = logging.getLogger(__name__)
 router = APIRouter(tags=['health'])
 
 @router.get('/health')
@@ -12,7 +14,8 @@ async def health(request: Request):
         supabase.rpc("ping").execute()
         db_status = "ok"
     except Exception as e:
-        db_status = f"error: {e}"
+        logger.error("Database health check failed: %s", e)
+        db_status = "error"
 
     return {
         'status': 'ok',
