@@ -1,15 +1,17 @@
-<br/><br/>
 <div align="center">
   <img src="./assets/gimmeloot-logo.png" width="110" alt="GimmeLoot logo" />
   <br/>
   <img src="./assets/gimmeloot-title.svg" width="260" alt="GimmeLoot" />
   <br/><br/>
 
+  ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python)
   ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi)
   ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
   ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)
   ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase)
-  ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python)
+  ![CI](https://github.com/nicklasskoglund/GimmeLoot/actions/workflows/ci.yml/badge.svg?branch=main)
+  ![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?style=flat-square&logo=pre-commit)
+  ![gitleaks](https://img.shields.io/badge/protected%20by-gitleaks-blue?style=flat-square)
 </div>
 
 > A fullstack app for discovering free game giveaways — powered by the [GamerPower API](https://www.gamerpower.com/api-read).
@@ -41,6 +43,7 @@
 | Database | Supabase (PostgreSQL) |
 | Config | pydantic-settings |
 | Testing | pytest, Vitest, React Testing Library, Cypress |
+| Security | Gitleaks, detect-secrets, Dependabot, GitHub Secret Scanning |
 
 ---
 
@@ -236,6 +239,18 @@ cd frontend
 npm run test        # Vitest unit tests
 npm run test:e2e    # Cypress E2E tests
 ```
+
+---
+
+## Security
+
+GimmeLoot uses three layers of secret scanning:
+
+- **GitHub Secret Scanning** — enabled in repository settings; automatically detects leaked tokens from known providers (AWS, Stripe, etc.)
+- **Gitleaks in GitHub Actions** — runs on every push and pull request via `.github/workflows/secret-scan.yml`, catching a broader range of patterns than the built-in scanner
+- **Local pre-commit hooks** — `gitleaks` and `detect-secrets` configured in `.pre-commit-config.yaml`; secrets are blocked before they ever leave the developer's machine
+
+Dependencies are monitored by **Dependabot**, with alerts enabled for both the Python and npm ecosystems.
 
 ---
 
