@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  backend:
+    name: Backend tests (pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pytest
+        env:
+          JWT_SECRET: test-secret-for-ci  # pragma: allowlist secret
+          JWT_ALGORITHM: HS256
+          JWT_EXPIRE_MINUTES: 60
+          ALLOWED_ORIGINS_STR: https://example.com
+          SUPABASE_URL: https://db.example.com
+          SUPABASE_KEY: test-key-for-ci
+          GAMERPOWER_BASE_URL: https://www.gamerpower.com/api
+        run: pytest --tb=short -q
+
+  frontend:
+    name: Frontend tests (vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run vitest
+        working-directory: frontend
+        run: npx vitest run
