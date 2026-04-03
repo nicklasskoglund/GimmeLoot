@@ -12,6 +12,7 @@
   ![CI](https://github.com/nicklasskoglund/GimmeLoot/actions/workflows/ci.yml/badge.svg?branch=main)
   ![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?style=flat-square&logo=pre-commit)
   ![gitleaks](https://img.shields.io/badge/protected%20by-gitleaks-blue?style=flat-square)
+  ![CodeQL](https://github.com/nicklasskoglund/GimmeLoot/actions/workflows/codeql.yml/badge.svg?branch=main)
 </div>
 
 > A fullstack app for discovering free game giveaways — powered by the [GamerPower API](https://www.gamerpower.com/api-read).
@@ -43,7 +44,7 @@
 | Database | Supabase (PostgreSQL) |
 | Config | pydantic-settings |
 | Testing | pytest, Vitest, React Testing Library, Cypress |
-| Security | Gitleaks, detect-secrets, Dependabot, GitHub Secret Scanning |
+| Security | Gitleaks, detect-secrets, Dependabot, GitHub Secret Scanning, CodeQL |
 
 ---
 
@@ -249,6 +250,7 @@ GimmeLoot uses three layers of secret scanning:
 - **GitHub Secret Scanning** — enabled in repository settings; automatically detects leaked tokens from known providers (AWS, Stripe, etc.)
 - **Gitleaks in GitHub Actions** — runs on every push and pull request via `.github/workflows/secret-scan.yml`, catching a broader range of patterns than the built-in scanner
 - **Local pre-commit hooks** — `gitleaks` and `detect-secrets` configured in `.pre-commit-config.yaml`; secrets are blocked before they ever leave the developer's machine
+- **CodeQL** — static analysis workflow scanning Python and TypeScript for security vulnerabilities; runs on every push and pull request, and on a weekly schedule
 
 Dependencies are monitored by **Dependabot**, with alerts enabled for both the Python and npm ecosystems.
 
