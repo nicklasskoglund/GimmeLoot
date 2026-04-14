@@ -101,10 +101,10 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
 
         <div className="flex gap-2 mt-auto pt-2">
           <Button variant="outline" size="sm" className="flex-1" asChild>
-            <a href={giveaway.open_giveaway_url} target='_blank' rel='noreferrer'>
+            <Link to={`/giveaways/${giveaway.id}`}>
               <ExternalLink className="w-3 h-3 mr-1" />
               Claim
-            </a>
+            </Link>
           </Button>
 
           {user && (
