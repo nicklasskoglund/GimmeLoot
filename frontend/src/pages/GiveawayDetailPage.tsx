@@ -22,6 +22,65 @@ function isValidExternalUrl(url: string | undefined | null): boolean {
 }
 
 
+interface ParsedInstructionContent {
+  codes: string[]
+  instructions: string | null
+}
+
+function normalizeInstructionLine(line: string): string {
+  return line.replace(/^\d+\.\s*/, '').trim()
+}
+
+function parseInstructionContent(content: string | undefined | null): ParsedInstructionContent {
+  if (!content || content.trim() === '') {
+    return { codes: [], instructions: null }
+  }
+
+  const lines = content
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean)
+
+  const codes: string[] = []
+  const instructionLines: string[] = []
+
+  for (const rawLine of lines) {
+    const cleanedLine = normalizeInstructionLine(rawLine)
+
+    const labeledCodeMatch = cleanedLine.match(
+      /^(?:new\s+codes?|codes?|promo\s+codes?|gift\s+codes?|redeem\s+codes?|keys?)\s*[:\-]\s*(.+)$/i
+    )
+
+    if (labeledCodeMatch) {
+      const extractedCodes = labeledCodeMatch[1]
+        .split(/[,;]+/)
+        .map(code => code.trim())
+        .filter(Boolean)
+
+      codes.push(...extractedCodes)
+      continue
+    }
+
+    const standaloneCodeMatch = cleanedLine.match(/^(?=.*\d)[A-Z0-9]{4,}(?:-[A-Z0-9]{4,})+$/)
+
+    if (standaloneCodeMatch) {
+      codes.push(cleanedLine)
+      continue
+    }
+
+    instructionLines.push(rawLine)
+  }
+
+  const uniqueCodes = Array.from(new Set(codes))
+  const instructions = instructionLines.length > 0 ? instructionLines.join('\n') : null
+
+  return {
+    codes: uniqueCodes,
+    instructions,
+  }
+}
+
+
 function GiveawayDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -33,6 +92,7 @@ function GiveawayDetailPage() {
   const [saving, setSaving] = useState(false)
 
   const hasValidClaimUrl = isValidExternalUrl(giveaway?.open_giveaway_url)
+  const { codes, instructions } = parseInstructionContent(giveaway?.instructions)
 
   useEffect(() => {
     if (!id) return
@@ -54,12 +114,6 @@ function GiveawayDetailPage() {
     }
     fetchData()
   }, [id, user])
-
-
-    const instructionTitle = giveaway?.type?.toLowerCase().includes('loot') ||
-        giveaway?.type?.toLowerCase().includes('dlc')
-        ? 'New Codes'
-        : 'Instructions'
 
 
     const handleToggleFavorite = async () => {
@@ -172,16 +226,29 @@ function GiveawayDetailPage() {
         </div>
       )}
 
-      {/* Instructions / New Codes */}
-      {giveaway.instructions && (
-        <div className="flex flex-col gap-2 border border-border rounded-xl p-6">
-          <h2 className="text-lg font-semibold">{instructionTitle}</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-            {giveaway.instructions}
-          </p>
+      {/* New Codes */}
+      {codes.length > 0 && (
+        <div className="flex flex-col gap-3 border border-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold">New Codes</h2>
+          <div className="flex flex-wrap gap-2">
+            {codes.map(code => (
+              <Badge key={code} variant="secondary" className="px-3 py-1 font-mono text-sm">
+                {code}
+              </Badge>
+            ))}
+          </div>
         </div>
       )}
 
+      {/* Instructions */}
+      {instructions && (
+        <div className="flex flex-col gap-2 border border-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold">Instructions</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+            {instructions}
+          </p>
+        </div>
+      )}
     </div>
   )
 }
