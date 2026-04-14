@@ -4,7 +4,7 @@ import { useState } from 'react'
 import type { Giveaway } from '../types/giveaway'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Star, ExternalLink, Loader2, Clock } from 'lucide-react'
+import { Star, Loader2, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Link } from 'react-router-dom'
 
@@ -102,7 +102,6 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
         <div className="flex gap-2 mt-auto pt-2">
           <Button variant="outline" size="sm" className="flex-1" asChild>
             <Link to={`/giveaways/${giveaway.id}`}>
-              <ExternalLink className="w-3 h-3 mr-1" />
               Claim
             </Link>
           </Button>
