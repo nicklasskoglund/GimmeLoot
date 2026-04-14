@@ -48,7 +48,7 @@ function parseInstructionContent(content: string | undefined | null): ParsedInst
     const cleanedLine = normalizeInstructionLine(rawLine)
 
     const labeledCodeMatch = cleanedLine.match(
-      /^(?:new\s+codes?|codes?|promo\s+codes?|gift\s+codes?|redeem\s+codes?|keys?)\s*[:\-]\s*(.+)$/i
+      /^(?:new\s+codes?|codes?|promo\s+codes?|gift\s+codes?|redeem\s+codes?|keys?)\s*[:-]\s*(.+)$/i
     )
 
     if (labeledCodeMatch) {
