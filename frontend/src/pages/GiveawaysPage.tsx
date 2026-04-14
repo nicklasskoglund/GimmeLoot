@@ -7,6 +7,56 @@ import { useAuth } from '../context/AuthContext'
 import { getFavorites } from '../api/favorites'
 
 
+function getEndDateTimestamp(endDate: string | undefined | null): number | null {
+  if (!endDate || endDate === 'N/A') return null
+
+  const timestamp = new Date(endDate).getTime()
+  return Number.isNaN(timestamp) ? null : timestamp
+}
+
+function isExpiredGiveaway(giveaway: Giveaway, now: number): boolean {
+  const status = giveaway.status?.trim().toLowerCase()
+  const endDateTimestamp = getEndDateTimestamp(giveaway.end_date)
+
+  if (status === 'expired') return true
+  if (endDateTimestamp === null) return false
+
+  return endDateTimestamp <= now
+}
+
+function sortGiveawaysForDefaultView(giveaways: Giveaway[]): Giveaway[] {
+  const now = Date.now()
+
+  return [...giveaways].sort((a, b) => {
+    const aExpired = isExpiredGiveaway(a, now)
+    const bExpired = isExpiredGiveaway(b, now)
+
+    if (aExpired !== bExpired) {
+      return aExpired ? 1 : -1
+    }
+
+    const aEndDate = getEndDateTimestamp(a.end_date)
+    const bEndDate = getEndDateTimestamp(b.end_date)
+
+    if (!aExpired && !bExpired) {
+      if (aEndDate !== null && bEndDate !== null) {
+        return aEndDate - bEndDate
+      }
+
+      if (aEndDate !== null) return -1
+      if (bEndDate !== null) return 1
+
+      return a.title.localeCompare(b.title)
+    }
+
+    if (aEndDate !== null && bEndDate !== null) {
+      return aEndDate - bEndDate
+    }
+
+    return a.title.localeCompare(b.title)
+  })
+}
+
 function GiveawaysPage() {
   const [giveaways, setGiveaways] = useState<Giveaway[]>([])
   const [search, setSearch] = useState('')
@@ -25,10 +75,14 @@ function GiveawaysPage() {
       try {
         setLoading(true)
         setError(null)
+
         const data = search
           ? await searchGiveaways(search)
           : await getGiveaways()
-        setGiveaways(data)
+
+        const sortedData = sortGiveawaysForDefaultView(data)
+        setGiveaways(sortedData)
+        
       } catch {
         setError('Failed to load giveaways.')
       } finally {
