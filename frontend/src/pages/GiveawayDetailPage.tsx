@@ -10,6 +10,18 @@ import { ArrowLeft, ExternalLink, Star, Loader2, Clock, Users } from 'lucide-rea
 import { toast } from 'sonner'
 
 
+function isValidExternalUrl(url: string | undefined | null): boolean {
+  if (!url || url.trim() === '' || url === 'N/A') return false
+
+  try {
+    const parsedUrl = new URL(url)
+    return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+
 function GiveawayDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -19,6 +31,8 @@ function GiveawayDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  const hasValidClaimUrl = isValidExternalUrl(giveaway?.open_giveaway_url)
 
   useEffect(() => {
     if (!id) return
@@ -132,11 +146,14 @@ function GiveawayDetailPage() {
 
       {/* Claim + Save */}
       <div className="flex gap-3">
-        <Button asChild className="flex-1 sm:flex-none">
-          <a href={giveaway.open_giveaway_url} target="_blank" rel="noreferrer">
-            <ExternalLink className="w-4 h-4 mr-2" /> Claim Giveaway
-          </a>
-        </Button>
+        {hasValidClaimUrl && (
+          <Button asChild className="flex-1 sm:flex-none">
+            <a href={giveaway.open_giveaway_url} target="_blank" rel="noreferrer">
+              <ExternalLink className="w-4 h-4 mr-2" /> Claim Giveaway
+            </a>
+          </Button>
+        )}
+
         {user && (
           <Button variant={saved ? 'secondary' : 'default'} disabled={saving} onClick={handleToggleFavorite}>
             {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Star className={`w-4 h-4 mr-2 ${saved ? 'fill-current' : ''}`} />}
