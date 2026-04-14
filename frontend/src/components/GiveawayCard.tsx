@@ -4,9 +4,20 @@ import { useState } from 'react'
 import type { Giveaway } from '../types/giveaway'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Star, ExternalLink, Loader2, Clock } from 'lucide-react'
+import { Star, Loader2, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Link } from 'react-router-dom'
+
+function isValidExternalUrl(url: string | undefined | null): boolean {
+  if (!url || url.trim() === '' || url === 'N/A') return false
+
+  try {
+    const parsedUrl = new URL(url)
+    return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
 
 interface GiveawayCardProps {
   giveaway: Giveaway
@@ -31,6 +42,7 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
   const [loading, setLoading] = useState(false)
   const endDateLabel = formatEndDate(giveaway.end_date)
   const isExpired = endDateLabel === 'Expired'
+  const hasValidClaimUrl = isValidExternalUrl(giveaway.open_giveaway_url)
 
   const handleToggleFavorite = async () => {
     setLoading(true)
@@ -100,12 +112,13 @@ function GiveawayCard({ giveaway, initialSaved = false }: GiveawayCardProps) {
         </div>
 
         <div className="flex gap-2 mt-auto pt-2">
-          <Button variant="outline" size="sm" className="flex-1" asChild>
-            <a href={giveaway.open_giveaway_url} target='_blank' rel='noreferrer'>
-              <ExternalLink className="w-3 h-3 mr-1" />
-              Claim
-            </a>
-          </Button>
+          {hasValidClaimUrl && (
+            <Button variant="outline" size="sm" className="flex-1" asChild>
+              <Link to={`/giveaways/${giveaway.id}`}>
+                Claim
+              </Link>
+            </Button>
+          )}
 
           {user && (
             <Button

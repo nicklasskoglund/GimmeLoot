@@ -10,6 +10,77 @@ import { ArrowLeft, ExternalLink, Star, Loader2, Clock, Users } from 'lucide-rea
 import { toast } from 'sonner'
 
 
+function isValidExternalUrl(url: string | undefined | null): boolean {
+  if (!url || url.trim() === '' || url === 'N/A') return false
+
+  try {
+    const parsedUrl = new URL(url)
+    return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+
+interface ParsedInstructionContent {
+  codes: string[]
+  instructions: string | null
+}
+
+function normalizeInstructionLine(line: string): string {
+  return line.replace(/^\d+\.\s*/, '').trim()
+}
+
+function parseInstructionContent(content: string | undefined | null): ParsedInstructionContent {
+  if (!content || content.trim() === '') {
+    return { codes: [], instructions: null }
+  }
+
+  const lines = content
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean)
+
+  const codes: string[] = []
+  const instructionLines: string[] = []
+
+  for (const rawLine of lines) {
+    const cleanedLine = normalizeInstructionLine(rawLine)
+
+    const labeledCodeMatch = cleanedLine.match(
+      /^(?:new\s+codes?|codes?|promo\s+codes?|gift\s+codes?|redeem\s+codes?|keys?)\s*[:-]\s*(.+)$/i
+    )
+
+    if (labeledCodeMatch) {
+      const extractedCodes = labeledCodeMatch[1]
+        .split(/[,;]+/)
+        .map(code => code.trim())
+        .filter(Boolean)
+
+      codes.push(...extractedCodes)
+      continue
+    }
+
+    const standaloneCodeMatch = cleanedLine.match(/^(?=.*\d)[A-Z0-9]{4,}(?:-[A-Z0-9]{4,})+$/)
+
+    if (standaloneCodeMatch) {
+      codes.push(cleanedLine)
+      continue
+    }
+
+    instructionLines.push(rawLine)
+  }
+
+  const uniqueCodes = Array.from(new Set(codes))
+  const instructions = instructionLines.length > 0 ? instructionLines.join('\n') : null
+
+  return {
+    codes: uniqueCodes,
+    instructions,
+  }
+}
+
+
 function GiveawayDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -19,6 +90,9 @@ function GiveawayDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  const hasValidClaimUrl = isValidExternalUrl(giveaway?.open_giveaway_url)
+  const { codes, instructions } = parseInstructionContent(giveaway?.instructions)
 
   useEffect(() => {
     if (!id) return
@@ -40,12 +114,6 @@ function GiveawayDetailPage() {
     }
     fetchData()
   }, [id, user])
-
-
-    const instructionTitle = giveaway?.type?.toLowerCase().includes('loot') ||
-        giveaway?.type?.toLowerCase().includes('dlc')
-        ? 'New Codes'
-        : 'Instructions'
 
 
     const handleToggleFavorite = async () => {
@@ -132,11 +200,14 @@ function GiveawayDetailPage() {
 
       {/* Claim + Save */}
       <div className="flex gap-3">
-        <Button asChild className="flex-1 sm:flex-none">
-          <a href={giveaway.open_giveaway_url} target="_blank" rel="noreferrer">
-            <ExternalLink className="w-4 h-4 mr-2" /> Claim Giveaway
-          </a>
-        </Button>
+        {hasValidClaimUrl && (
+          <Button asChild className="flex-1 sm:flex-none">
+            <a href={giveaway.open_giveaway_url} target="_blank" rel="noreferrer">
+              <ExternalLink className="w-4 h-4 mr-2" /> Claim Giveaway
+            </a>
+          </Button>
+        )}
+
         {user && (
           <Button variant={saved ? 'secondary' : 'default'} disabled={saving} onClick={handleToggleFavorite}>
             {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Star className={`w-4 h-4 mr-2 ${saved ? 'fill-current' : ''}`} />}
@@ -155,16 +226,29 @@ function GiveawayDetailPage() {
         </div>
       )}
 
-      {/* Instructions / New Codes */}
-      {giveaway.instructions && (
-        <div className="flex flex-col gap-2 border border-border rounded-xl p-6">
-          <h2 className="text-lg font-semibold">{instructionTitle}</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-            {giveaway.instructions}
-          </p>
+      {/* New Codes */}
+      {codes.length > 0 && (
+        <div className="flex flex-col gap-3 border border-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold">New Codes</h2>
+          <div className="flex flex-wrap gap-2">
+            {codes.map(code => (
+              <Badge key={code} variant="secondary" className="px-3 py-1 font-mono text-sm">
+                {code}
+              </Badge>
+            ))}
+          </div>
         </div>
       )}
 
+      {/* Instructions */}
+      {instructions && (
+        <div className="flex flex-col gap-2 border border-border rounded-xl p-6">
+          <h2 className="text-lg font-semibold">Instructions</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+            {instructions}
+          </p>
+        </div>
+      )}
     </div>
   )
 }
