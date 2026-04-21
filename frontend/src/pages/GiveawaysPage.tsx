@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useNavigationType } from 'react-router-dom'
 import type { Giveaway } from '../types/giveaway'
 import { getGiveaways, searchGiveaways } from '../api/giveaways'
 import GiveawayList from '../components/GiveawayList'
@@ -64,6 +65,10 @@ function GiveawaysPage() {
   const [error, setError] = useState<string | null>(null)
   const { user } = useAuth()
   const [savedIds, setSavedIds] = useState<number[]>([])
+  const navigationType = useNavigationType()
+  const scrollYRef = useRef(0)
+
+  history.scrollRestoration = 'manual'
 
   useEffect(() => {
     if (!user) return
@@ -93,6 +98,60 @@ function GiveawaysPage() {
     const debounce = setTimeout(fetchGiveaways, 400)
     return () => clearTimeout(debounce)
   }, [search])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      scrollYRef.current = window.scrollY
+    }
+    const handleClick = () => {
+      sessionStorage.setItem('giveaways-scroll-y', String(scrollYRef.current))
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('click', handleClick, { capture: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('click', handleClick, { capture: true })
+    }
+  }, [])
+
+  useEffect(() => {
+    if (loading) return
+    if (navigationType !== 'POP') return
+    const saved = sessionStorage.getItem('giveaways-scroll-y')
+    if (!saved) return
+    sessionStorage.removeItem('giveaways-scroll-y')
+    const target = Number(saved)
+
+    let attempts = 0
+    const maxAttempts = 20
+    let timerId: ReturnType<typeof setTimeout>
+    let cancelled = false
+
+    const cancel = () => { cancelled = true; clearTimeout(timerId) }
+
+    const poll = () => {
+      if (cancelled) return
+      window.scrollTo({ top: target, behavior: 'instant' })
+      attempts++
+      if (attempts < maxAttempts) {
+        timerId = setTimeout(poll, 100)
+      } else {
+        window.removeEventListener('wheel', cancel)
+        window.removeEventListener('touchstart', cancel)
+      }
+    }
+
+    window.addEventListener('wheel', cancel, { once: true })
+    window.addEventListener('touchstart', cancel, { once: true })
+
+    timerId = setTimeout(poll, 50)
+
+    return () => {
+      cancel()
+      window.removeEventListener('wheel', cancel)
+      window.removeEventListener('touchstart', cancel)
+    }
+  }, [loading, navigationType])
 
   return (
     <div className="flex flex-col gap-6">
