@@ -20,7 +20,7 @@ filelock==3.25.2
 fsspec==2026.2.0
 gitdb==4.0.12
 gitdb2==4.0.2
-GitPython==3.1.47
+GitPython==3.1.50
 h11==0.16.0
 h2==4.3.0
 hpack==4.1.0
@@ -85,7 +85,7 @@ truffleHogRegexes==0.0.7
 typer==0.24.1
 typing-inspection==0.4.2
 typing_extensions==4.15.0
-urllib3==2.6.3
+urllib3==2.7.0
 uvicorn==0.41.0
 virtualenv==21.2.0
 websockets==15.0.1
