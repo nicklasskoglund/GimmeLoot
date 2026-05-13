@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { addFavorite, getFavorites, removeFavorite } from '../api/favorites'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, ExternalLink, Star, Loader2, Clock, Users } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Star, Loader2, Clock, Users, Copy, Check } from 'lucide-react'
 import { toast } from 'sonner'
 
 
@@ -90,6 +90,14 @@ function GiveawayDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [copiedCode, setCopiedCode] = useState<string | null>(null)
+
+  const handleCopy = (code: string) => {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopiedCode(code)
+      setTimeout(() => setCopiedCode(null), 2000)
+    })
+  }
 
   const hasValidClaimUrl = isValidExternalUrl(giveaway?.open_giveaway_url)
   const { codes, instructions } = parseInstructionContent(giveaway?.instructions)
@@ -232,9 +240,21 @@ function GiveawayDetailPage() {
           <h2 className="text-lg font-semibold">New Codes</h2>
           <div className="flex flex-wrap gap-2">
             {codes.map(code => (
-              <Badge key={code} variant="secondary" className="px-3 py-1 font-mono text-sm">
-                {code}
-              </Badge>
+              <div key={code} className="relative group">
+                <Badge variant="secondary" className="px-3 py-1 pr-8 font-mono text-sm">
+                  {code}
+                </Badge>
+                <button
+                  onClick={() => handleCopy(code)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label={`Copy code ${code}`}
+                >
+                  {copiedCode === code
+                    ? <Check className="w-3 h-3 text-green-500" />
+                    : <Copy className="w-3 h-3 text-muted-foreground" />
+                  }
+                </button>
+              </div>
             ))}
           </div>
         </div>
