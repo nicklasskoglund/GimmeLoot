@@ -71,7 +71,7 @@ safety-schemas==0.0.16
 shellingham==1.5.4
 six==1.17.0
 smmap==5.0.3
-starlette==0.52.1
+starlette==1.0.1
 storage3==2.28.2
 StrEnum==0.4.15
 strictyaml==1.7.3
