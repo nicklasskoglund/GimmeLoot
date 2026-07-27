@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { updateUser as updateUserApi, deleteUser } from '../api/auth'
 import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Settings, Loader2 } from 'lucide-react'

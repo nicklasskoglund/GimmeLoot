@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Star, Loader2, Clock } from 'lucide-react'
 import { toast } from 'sonner'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 function isValidExternalUrl(url: string | undefined | null): boolean {
   if (!url || url.trim() === '' || url === 'N/A') return false

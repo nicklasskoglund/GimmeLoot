@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigationType } from 'react-router-dom'
+import { useNavigationType } from 'react-router'
 import type { Giveaway } from '../types/giveaway'
 import { getGiveaways, searchGiveaways } from '../api/giveaways'
 import GiveawayList from '../components/GiveawayList'
