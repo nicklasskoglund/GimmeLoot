@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router'
 import { useAuth } from "../context/AuthContext"
 import { registerUser } from "../api/auth"
 import { Button } from "@/components/ui/button"

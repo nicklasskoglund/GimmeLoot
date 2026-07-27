@@ -3,11 +3,11 @@ import { getFavorites, removeFavorite } from '../api/favorites'
 import type { Favorite } from '../api/favorites'
 import { getGiveaway } from '../api/giveaways'
 import type { Giveaway } from '../types/giveaway'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { Button } from '@/components/ui/button'
 import { Trash2, ExternalLink, Star } from 'lucide-react'
 import { toast } from 'sonner'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 function FavoritesPage() {
   const navigate = useNavigate()
