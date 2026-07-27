@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router'
 import type { Giveaway } from '../types/giveaway'
 import { getGiveaway } from '../api/giveaways'
 import { useAuth } from '../context/AuthContext'

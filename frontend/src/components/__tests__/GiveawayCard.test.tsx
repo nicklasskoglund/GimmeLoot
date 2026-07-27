@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter } from 'react-router'
 import GiveawayCard from '../GiveawayCard'
 import * as AuthContext from '../../context/AuthContext'
 import * as favoritesApi from '../../api/favorites'

@@ -1,5 +1,5 @@
 import { ThemeProvider } from './context/ThemeContext'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router'
 import { Toaster } from '@/components/ui/sonner'
 import GiveawaysPage from './pages/GiveawaysPage'
 import GiveawayDetailPage from './pages/GiveawayDetailPage'
