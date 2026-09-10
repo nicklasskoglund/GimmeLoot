@@ -23,7 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# Cypress
-cypress/videos/
-cypress/screenshots/
-cypress/downloads/
+# Playwright
+test-results/
+playwright-report/
+blob-report/
