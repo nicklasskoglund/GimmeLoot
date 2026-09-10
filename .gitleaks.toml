@@ -15,6 +15,7 @@ tags = ["localhost", "hardcoded"]
 [rules.allowlist]
 paths = [
     "frontend/cypress.config.ts",
+    "frontend/playwright.config.ts",
     ".gitleaks.toml"
 ]
 
