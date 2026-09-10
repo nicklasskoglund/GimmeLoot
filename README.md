@@ -43,7 +43,7 @@
 | Frontend | React, TypeScript, Vite, Tailwind CSS v4, shadcn/ui |
 | Database | Supabase (PostgreSQL) |
 | Config | pydantic-settings |
-| Testing | pytest, Vitest, React Testing Library, Cypress |
+| Testing | pytest, Vitest, React Testing Library, Playwright |
 | Security | Gitleaks, detect-secrets, Dependabot, GitHub Secret Scanning, CodeQL |
 
 ---
@@ -188,10 +188,9 @@ backend/
     └── password.py
 
 frontend/
-├── cypress/
-│   └── e2e/
-│       ├── login.cy.ts
-│       └── protected_route.cy.ts
+├── e2e/
+│   ├── login.spec.ts
+│   └── protected-route.spec.ts
 ├── public/
 ├── src/
 │   ├── api/
@@ -238,7 +237,7 @@ pytest --tb=short -q
 ```bash
 cd frontend
 npm run test        # Vitest unit tests
-npm run test:e2e    # Cypress E2E tests
+npm run test:e2e    # Playwright E2E tests
 ```
 
 ---
