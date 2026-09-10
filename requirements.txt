@@ -35,7 +35,6 @@ marshmallow==4.2.3
 mdurl==0.1.2
 mmh3==5.2.1
 multidict==6.7.1
-nltk==3.10.0
 nodeenv==1.10.0
 packaging==26.0
 platformdirs==4.9.4
@@ -63,8 +62,6 @@ regex==2026.3.32
 requests==2.33.0
 rich==14.3.3
 ruamel.yaml==0.19.1
-safety==3.7.0
-safety-schemas==0.0.16
 shellingham==1.5.4
 six==1.17.0
 smmap==5.0.3
