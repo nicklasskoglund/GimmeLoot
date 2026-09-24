@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigationType } from 'react-router'
 import type { Giveaway } from '../types/giveaway'
-import { getGiveaways, searchGiveaways } from '../api/giveaways'
+import { getGiveaways, type GiveawayFilters } from '../api/giveaways'
 import GiveawayList from '../components/GiveawayList'
 import SearchBar from '../components/SearchBar'
+import FilterBar from '../components/FilterBar'
 import { useAuth } from '../context/AuthContext'
 import { getFavorites } from '../api/favorites'
 
@@ -61,6 +62,7 @@ function sortGiveawaysForDefaultView(giveaways: Giveaway[]): Giveaway[] {
 function GiveawaysPage() {
   const [giveaways, setGiveaways] = useState<Giveaway[]>([])
   const [search, setSearch] = useState('')
+  const [filters, setFilters] = useState<GiveawayFilters>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user } = useAuth()
@@ -81,11 +83,12 @@ function GiveawaysPage() {
         setLoading(true)
         setError(null)
 
-        const data = search
-          ? await searchGiveaways(search)
-          : await getGiveaways()
+        const data = await getGiveaways({
+          ...filters,
+          contains: search || undefined,
+        })
 
-        const sortedData = sortGiveawaysForDefaultView(data)
+        const sortedData = filters.sort_by ? data : sortGiveawaysForDefaultView(data)
         setGiveaways(sortedData)
         
       } catch {
@@ -97,7 +100,7 @@ function GiveawaysPage() {
 
     const debounce = setTimeout(fetchGiveaways, 400)
     return () => clearTimeout(debounce)
-  }, [search])
+  }, [search, filters])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -165,6 +168,7 @@ function GiveawaysPage() {
       </div>
 
       <SearchBar value={search} onChange={setSearch} />
+      <FilterBar filters={filters} onChange={setFilters} />
 
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
