@@ -1,0 +1,16 @@
+-r requirements.txt
+cfgv==3.5.0
+detect-secrets==1.5.0
+distlib==0.4.0
+filelock==3.25.2
+identify==2.6.18
+iniconfig==2.3.0
+nodeenv==1.10.0
+platformdirs==4.9.4
+pluggy==1.6.0
+pre_commit==4.5.1
+pytest==9.0.3
+pytest-asyncio==1.3.0
+python-discovery==1.2.1
+PyYAML==6.0.3
+virtualenv==21.2.0
