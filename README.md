@@ -54,9 +54,11 @@ Running locally requires Python 3.11+, Node.js 18+ and your own Supabase project
 
 ### Backend
 ```bash
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 python backend/app.py
 ```
+
+`requirements.txt` contains runtime dependencies only and is what production installs. `requirements-dev.txt` includes it and adds the test and tooling dependencies. Both files are pinned and maintained by hand: add new runtime packages to `requirements.txt` and new dev/test tools to `requirements-dev.txt`. Do not use `pip freeze > requirements.txt`, since it would mix them again.
 
 ### Frontend
 ```bash
@@ -229,6 +231,7 @@ frontend/
 ## Testing
 
 ### Backend
+Requires the dev dependencies (`pip install -r requirements-dev.txt`).
 ```bash
 pytest --tb=short -q
 ```
