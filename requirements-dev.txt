@@ -2,7 +2,7 @@
 cfgv==3.5.0
 detect-secrets==1.5.0
 distlib==0.4.4
-filelock==3.25.2
+filelock==4.2.3
 identify==2.6.18
 iniconfig==2.3.0
 nodeenv==1.10.0
